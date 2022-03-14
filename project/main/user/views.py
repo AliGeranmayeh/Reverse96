@@ -6,6 +6,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from .models import CustomUser
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from django.db.models import Q
+from django.contrib.auth.hashers import check_password
 
 
 class RegisterView(APIView):
@@ -24,9 +26,14 @@ class RegisterView(APIView):
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data, partial=True)
-
-
-
-
+        serializer.is_valid(raise_exception=True)
+        username = serializer.validated_data.get("username")
+        password = serializer.validated_data.get("password")
+        user = CustomUser.objects.filter(Q(username=username)|Q(email=username)).first()
+        if not user or not check_password(password, user.password):
+            return Response ({"message": "Invalid user"}, status=status.HTTP_404_NOT_FOUND)
+        access_tk = str(AccessToken.for_user(user))
+        refresh_tk = str(RefreshToken.for_user(user))
+        return Response(data={"access": access_tk, "refresh": refresh_tk}, status=status.HTTP_200_OK)
 
 
