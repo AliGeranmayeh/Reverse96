@@ -16,7 +16,7 @@ from random import randint
 def randomNumber():
     seed(1)
     value = randint(1000,9999)
-    print(value)
+    return value
 
 class RegisterView(APIView):
     def post(self, request):
@@ -28,7 +28,7 @@ class RegisterView(APIView):
         access_tk = str(AccessToken.for_user(user))
         refresh_tk = str(RefreshToken.for_user(user))
         subject = 'welcome to Reverse96'
-        message = f'Hi {user.username}, thank you for registering. please click on link below: {randomNumber()}'
+        message = f'Hi {user.username}, thank you for registering. please enter this code to our website: {randomNumber()}'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [user.email]
         send_mail(subject, message, email_from, recipient_list, fail_silently=False)
