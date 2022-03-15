@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import LoginSerializer, RegisterSerializer
+from .serializer import LoginSerializer, RegisterSerializer,EmailValidationSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .models import CustomUser
+from .models import CustomUser,EmailValidation
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.db.models import Q
@@ -25,10 +25,12 @@ class RegisterView(APIView):
         serializer.save()
         user_data = serializer.data
         user = CustomUser.objects.get(id=user_data.get('id'))
+        validation_code = randomNumber()
+        email_code= EmailValidation.objects.create(email=user.email,code=validation_code)
         access_tk = str(AccessToken.for_user(user))
         refresh_tk = str(RefreshToken.for_user(user))
         subject = 'welcome to Reverse96'
-        message = f'Hi {user.username}, thank you for registering. please enter this code to our website: {randomNumber()}'
+        message = f'Hi {user.username}, thank you for registering. please enter this code to our website: {validation_code}'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [user.email]
         send_mail(subject, message, email_from, recipient_list, fail_silently=False)
@@ -54,4 +56,16 @@ class LoginView(APIView):
 
 class EmailValidationView(APIView):
     def get(self,request):
-        pass
+        serializer= EmailValidationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_data = serializer.data
+        code = serializer.validated_data.get("code")
+        email = serializer.validated_data.get("email")
+        user= EmailValidation.objects.get(email=email)
+        #user_code= EmailValidation.objects.get(code=user_data.get("code"))
+        if user.code!=code:
+            return Response({"message": "wrong code", }, status=status.HTTP_404_NOT_FOUND)
+        return Response(data={"message":"go to login"}, status=status.HTTP_200_OK)
+
+
+
