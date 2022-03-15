@@ -29,6 +29,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class EmailValidationSerializer(serializers.ModelSerializer):
     code = serializers.CharField(required=True, allow_null=False, allow_blank=False)
+    email = serializers.CharField(required=True, allow_null=False, allow_blank=False)
     class Meta:
         model = EmailValidation
         fields = ['id', 'email','code']
