@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, EmailValidation
 
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -26,3 +26,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+class EmailValidationSerializer(serializers.ModelSerializer):
+    code = serializers.CharField(required=True, allow_null=False, allow_blank=False)
+    class Meta:
+        model = EmailValidation
+        fields = ['id', 'email','code']
