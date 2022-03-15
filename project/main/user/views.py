@@ -8,6 +8,8 @@ from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.db.models import Q
 from django.contrib.auth.hashers import check_password
+from django.conf import settings
+from django.core.mail import send_mail
 
 
 class RegisterView(APIView):
