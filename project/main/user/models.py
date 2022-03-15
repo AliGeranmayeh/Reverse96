@@ -17,4 +17,4 @@ class EmailValidation(models.Model):
     code = models.IntegerField(unique=False)
     email = models.CharField(max_length=400, unique=True)
     def __str__(self):
-        return self.username
+        return self.email
