@@ -28,7 +28,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return instance
 
 class EmailValidationSerializer(serializers.ModelSerializer):
-    code = serializers.CharField(required=True, allow_null=False, allow_blank=False)
+    code = serializers.IntegerField(required=True, allow_null=False)
     email = serializers.CharField(required=True, allow_null=False, allow_blank=False)
     class Meta:
         model = EmailValidation
