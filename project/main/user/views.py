@@ -21,6 +21,11 @@ class RegisterView(APIView):
         user = CustomUser.objects.get(id=user_data.get('id'))
         access_tk = str(AccessToken.for_user(user))
         refresh_tk = str(RefreshToken.for_user(user))
+        subject = 'welcome to Reverse96'
+        message = f'Hi {user.username}, thank you for registering. please click on link below: LINK'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [user.email]
+        send_mail(subject, message, email_from, recipient_list, fail_silently=False)
         return Response({"message": serializer.data,
                          "access": access_tk,
                          "refresh": refresh_tk},
