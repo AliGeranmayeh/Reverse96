@@ -10,7 +10,13 @@ from django.db.models import Q
 from django.contrib.auth.hashers import check_password
 from django.conf import settings
 from django.core.mail import send_mail
+from random import seed
+from random import randint
 
+def randomNumber():
+    seed(1)
+    value = randint(1000,9999)
+    print(value)
 
 class RegisterView(APIView):
     def post(self, request):
@@ -22,7 +28,7 @@ class RegisterView(APIView):
         access_tk = str(AccessToken.for_user(user))
         refresh_tk = str(RefreshToken.for_user(user))
         subject = 'welcome to Reverse96'
-        message = f'Hi {user.username}, thank you for registering. please click on link below: LINK'
+        message = f'Hi {user.username}, thank you for registering. please click on link below: {randomNumber()}'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [user.email]
         send_mail(subject, message, email_from, recipient_list, fail_silently=False)
