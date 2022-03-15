@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
         return self.username
 
 class EmailValidation(models.Model):
-    code = models.CharField(max_length=4)
+    code = models.IntegerField(unique=False)
     email = models.CharField(max_length=400, unique=True)
     def __str__(self):
         return self.username
