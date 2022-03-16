@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import CustomUser, EmailValidation
-
+from django.utils.text import gettext_lazy
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 class LoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True, allow_null=False, allow_blank=False)
@@ -32,4 +33,22 @@ class EmailActivisionSerializer(serializers.ModelSerializer):
     email = serializers.CharField(required=True, allow_null=False, allow_blank=False)
     class Meta:
         model = EmailValidation
-        fields = ['id', 'email','code']
+        fields = ['id', 'email', 'code']
+
+
+class RefreshTokenSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+    default_error_messages = {
+        'bad_token': gettext_lazy('Token is invalid or expired')
+    }
+
+    def validate(self, attrs):
+        self.token = attrs['refresh']
+        return attrs
+
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+        except TokenError:
+            self.fail('bad_token')
