@@ -27,7 +27,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class EmailValidationSerializer(serializers.ModelSerializer):
+class EmailActivisionSerializer(serializers.ModelSerializer):
     code = serializers.IntegerField(required=True, allow_null=False)
     email = serializers.CharField(required=True, allow_null=False, allow_blank=False)
     class Meta:

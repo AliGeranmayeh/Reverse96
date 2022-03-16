@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import LoginSerializer, RegisterSerializer,EmailValidationSerializer
+from .serializer import LoginSerializer, RegisterSerializer,EmailActivisionSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .models import CustomUser,EmailValidation
@@ -56,9 +56,9 @@ class LoginView(APIView):
         return Response(data={"access": access_tk, "refresh": refresh_tk}, status=status.HTTP_200_OK)
 
 
-class EmailValidationView(APIView):
+class EmailActivisionView(APIView):
     def get(self,request):
-        serializer= EmailValidationSerializer(data=request.data)
+        serializer= EmailActivisionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_data = serializer.data
         code = serializer.validated_data.get("code")
