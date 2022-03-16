@@ -73,4 +73,6 @@ class EmailActivisionView(APIView):
         return Response(data={"message": "go to login", f"{user_obj.username} is_active": user_obj.is_active}, status=status.HTTP_200_OK)
 
 
+class LogoutView(GenericAPIView):
+    pass
 
