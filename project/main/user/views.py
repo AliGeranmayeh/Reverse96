@@ -14,7 +14,6 @@ from random import seed
 from random import randint
 
 def randomNumber():
-    seed(1)
     value = randint(1000, 9999)
     return value
 
@@ -25,12 +24,12 @@ class RegisterView(APIView):
         serializer.save()
         user_data = serializer.data
         user = CustomUser.objects.get(id=user_data.get('id'))
-        validation_code = randomNumber()
-        email_code= EmailValidation.objects.create(email=user.email,code=validation_code)
+        user_code = randomNumber()
+        email_validation= EmailValidation.objects.create(email=user.email,code=user_code)
         access_tk = str(AccessToken.for_user(user))
         refresh_tk = str(RefreshToken.for_user(user))
         subject = 'welcome to Reverse96'
-        message = f'Hi {user.username}, thank you for registering. please enter this code to our website: {validation_code}'
+        message = f'Hi {user.username}, thank you for registering. please enter this code to our website: {user_code}'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [user.email]
         send_mail(subject, message, email_from, recipient_list, fail_silently=False)
@@ -46,10 +45,13 @@ class LoginView(APIView):
         username = serializer.validated_data.get("username")
         password = serializer.validated_data.get("password")
         user = CustomUser.objects.filter(Q(username=username)|Q(email=username)).first()
+        user_obj = CustomUser.objects.get(Q(username=username)|Q(email=username))
         if not user:
             return Response({"message": "invalid username or email"}, status=status.HTTP_404_NOT_FOUND)
         if not check_password(password, user.password):
             return Response({"message": "wrong password"}, status=status.HTTP_404_NOT_FOUND)
+        if not user_obj.is_active:
+            return Response({"message": "validate your email"}, status=status.HTTP_403_FORBIDDEN)
         access_tk = str(AccessToken.for_user(user))
         refresh_tk = str(RefreshToken.for_user(user))
         return Response(data={"access": access_tk, "refresh": refresh_tk}, status=status.HTTP_200_OK)
@@ -64,8 +66,11 @@ class EmailValidationView(APIView):
         user= EmailValidation.objects.get(email=email)
         #user_code= EmailValidation.objects.get(code=user_data.get("code"))
         if user.code!=code:
-            return Response({"message": "wrong code", }, status=status.HTTP_404_NOT_FOUND)
-        return Response(data={"message":"go to login"}, status=status.HTTP_200_OK)
+            return Response({"message": "wrong code" }, status=status.HTTP_404_NOT_FOUND)
+        user_obj=CustomUser.objects.get(email=email)
+        user_obj.is_active = True
+        user_obj.save()
+        return Response(data={"message":"go to login",f"{user_obj.username} is_active": user_obj.is_active}, status=status.HTTP_200_OK)
 
 
 
