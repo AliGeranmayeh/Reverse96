@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import LoginSerializer, RegisterSerializer,EmailActivisionSerializer
+from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .models import CustomUser,EmailValidation
@@ -12,6 +12,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from random import seed
 from random import randint
+from rest_framework.generics import GenericAPIView
 
 def randomNumber():
     value = randint(1000, 9999)
@@ -74,5 +75,12 @@ class EmailActivisionView(APIView):
 
 
 class LogoutView(GenericAPIView):
-    pass
+    serializer_class = RefreshTokenSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, *args):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
