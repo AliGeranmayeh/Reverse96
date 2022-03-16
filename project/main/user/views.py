@@ -17,6 +17,7 @@ def randomNumber():
     value = randint(1000, 9999)
     return value
 
+
 class RegisterView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -25,18 +26,16 @@ class RegisterView(APIView):
         user_data = serializer.data
         user = CustomUser.objects.get(id=user_data.get('id'))
         user_code = randomNumber()
-        email_validation= EmailValidation.objects.create(email=user.email,code=user_code)
-        access_tk = str(AccessToken.for_user(user))
-        refresh_tk = str(RefreshToken.for_user(user))
+        email_validation= EmailValidation.objects.create(email=user.email, code=user_code)
+        #access_tk = str(AccessToken.for_user(user))
+        #refresh_tk = str(RefreshToken.for_user(user))
         subject = 'welcome to Reverse96'
         message = f'Hi {user.username}, thank you for registering. please enter this code to our website: {user_code}'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [user.email]
         send_mail(subject, message, email_from, recipient_list, fail_silently=False)
-        return Response({"message": serializer.data,
-                         "access": access_tk,
-                         "refresh": refresh_tk},
-                         status=status.HTTP_201_CREATED)
+        return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
+
 
 class LoginView(APIView):
     def post(self, request):
@@ -56,6 +55,7 @@ class LoginView(APIView):
         refresh_tk = str(RefreshToken.for_user(user))
         return Response(data={"access": access_tk, "refresh": refresh_tk}, status=status.HTTP_200_OK)
 
+
 class EmailValidationView(APIView):
     def get(self,request):
         serializer= EmailValidationSerializer(data=request.data)
@@ -65,12 +65,12 @@ class EmailValidationView(APIView):
         email = serializer.validated_data.get("email")
         user= EmailValidation.objects.get(email=email)
         #user_code= EmailValidation.objects.get(code=user_data.get("code"))
-        if user.code!=code:
+        if user.code != code:
             return Response({"message": "wrong code" }, status=status.HTTP_404_NOT_FOUND)
         user_obj=CustomUser.objects.get(email=email)
         user_obj.is_active = True
         user_obj.save()
-        return Response(data={"message":"go to login",f"{user_obj.username} is_active": user_obj.is_active}, status=status.HTTP_200_OK)
+        return Response(data={"message": "go to login", f"{user_obj.username} is_active": user_obj.is_active}, status=status.HTTP_200_OK)
 
 
 
