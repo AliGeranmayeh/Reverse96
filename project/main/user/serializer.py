@@ -9,13 +9,13 @@ class LoginSerializer(serializers.ModelSerializer):
                                      required=True, allow_blank=False, allow_null=False)
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'password', 'name', 'phone_number', 'address','is_active']
+        fields = ['id', 'username', 'email', 'password', 'name', 'phone_number', 'address', 'is_active', 'picture']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'password', 'name', 'phone_number', 'address','is_active']
+        fields = ['id', 'username', 'email', 'password', 'name', 'phone_number', 'address', 'is_active', 'picture']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -58,4 +58,4 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'email',  'name', 'address',
-                  'is_active', 'phone_number']
+                  'is_active', 'phone_number', 'picture']
