@@ -9,4 +9,5 @@ urlpatterns = [
     path('login/refresh', jwt_views.TokenRefreshView.as_view(), name="refresh-token"),
     path('email-activision',views.EmailActivisionView.as_view(), name="email-activision"),
     path('logout', views.LogoutView.as_view(), name="logout"),
+    path('public-profile/<str:pk>', views.PublicProfileView.as_view(), name="public-profile"),
 ]

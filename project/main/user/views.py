@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer
+from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .models import CustomUser,EmailValidation
@@ -76,7 +76,7 @@ class EmailActivisionView(APIView):
 
 class LogoutView(GenericAPIView):
     serializer_class = RefreshTokenSerializer
-    #permission_classes = (permissions.IsAuthenticated,)
+    permissions = [permissions.IsAuthenticated]
 
     def post(self, request, *args):
         serializer = self.get_serializer(data=request.data)
@@ -84,3 +84,8 @@ class LogoutView(GenericAPIView):
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class PublicProfileView(APIView):
+    def get(self, request, pk=None):
+        public_user_info = CustomUser.objects.get(username=pk)
+        serializer = PublicProfileSerializer(public_user_info, many=False)
+        return Response({'message': serializer.data})
