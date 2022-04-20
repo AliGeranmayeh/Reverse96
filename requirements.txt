@@ -1,6 +1,9 @@
 django==3.2.8
 djangorestframework==3.12.4
 djangorestframework-simplejwt==5.0.0
+pillow==8.4.0
+faker==13.3.4
+
 
 
 

@@ -86,6 +86,11 @@ class LogoutView(GenericAPIView):
 
 class PublicProfileView(APIView):
     def get(self, request, pk=None):
-        public_user_info = CustomUser.objects.get(username=pk)
+        public_user_info = CustomUser.objects.filter(username=pk)
         serializer = PublicProfileSerializer(public_user_info, many=False)
-        return Response({'message': serializer.data})
+        if(not public_user_info):
+            return Response({'message':"user does not exist"} ,status=status.HTTP_404_NOT_FOUND)
+        else:
+            existed_public_user_info = CustomUser.objects.get(username=pk)
+            serializer = PublicProfileSerializer(existed_public_user_info, many=False)
+            return Response({'message': serializer.data},status=status.HTTP_200_OK)
