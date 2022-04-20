@@ -1,22 +1,21 @@
 from rest_framework.test import APITestCase
 from django.urls import reverse
 from faker import Faker
-
+from random import randint
 
 class Test_SetUp(APITestCase):
     
 
     def setUp(self):
-        self.register_url = reverse("register")
         self.fake = Faker()
 
         self.user_data = {
-            "username": self.fake.email().split('@')[0] ,
+            "username": "ali" ,
             "email": self.fake.email(),
             "password": "12345",
             "address": self.fake.address(),
             "name": self.fake.name(),
-            "phone_number": self.fake.phone_number(),
+            "phone_number": randint(1000000000, 9999999999),
             "is_active":"True"
         }
 
