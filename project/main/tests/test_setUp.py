@@ -10,6 +10,7 @@ class Test_SetUp(APITestCase):
         self.fake = Faker()
 
         self.user_data = {
+            "id": f"{randint(1,1000)}",
             "username": "ali" ,
             "email": self.fake.email(),
             "password": "12345",
