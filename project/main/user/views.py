@@ -58,7 +58,7 @@ class LoginView(APIView):
 
 
 class EmailActivisionView(APIView):
-    def get(self,request):
+    def post(self,request):
         serializer= EmailActivisionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_data = serializer.data
@@ -82,7 +82,7 @@ class LogoutView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "logout process was successfull"},status=status.HTTP_204_NO_CONTENT)
 
 class PublicProfileView(APIView):
     def get(self, request, pk=None):
