@@ -27,6 +27,7 @@ class RegisterView(APIView):
         user_data = serializer.data
         user = CustomUser.objects.get(id=user_data.get('id'))
         user_code = randomNumber()
+        print(user_code)
         email_validation= EmailValidation.objects.create(email=user.email, code=user_code)
         #access_tk = str(AccessToken.for_user(user))
         #refresh_tk = str(RefreshToken.for_user(user))
@@ -64,18 +65,19 @@ class EmailActivisionView(APIView):
         user_data = serializer.data
         code = serializer.validated_data.get("code")
         email = serializer.validated_data.get("email")
-        if not (CustomUser.objects.filter(Q(email=email))):
-                if not (CustomUser.objects.filter(Q(username=email))):
-                    return Response({"message": "Invalid email or username" }, status=status.HTTP_404_NOT_FOUND)
-                email = CustomUser.objects.filter(Q(username=email)).first().email
-        user= EmailValidation.objects.get(email=email)
-        #user_code= EmailValidation.objects.get(code=user_data.get("code"))
-        if user.code != code:
-            return Response({"message": "wrong code" }, status=status.HTTP_404_NOT_FOUND)
-        user_obj=CustomUser.objects.get(email=email)
-        user_obj.is_active = True
-        user_obj.save()
-        return Response(data={"message": "go to login", f"{user_obj.username} is_active": user_obj.is_active}, status=status.HTTP_200_OK)
+        user_info = CustomUser.objects.filter(Q(username=email)|Q(email=email)).first()
+        if(user_info and user_info.is_active):
+            return Response({"message": "your account is already activated"}, status=status.HTTP_208_ALREADY_REPORTED)
+        else:
+            if (not user_info):
+                return Response({"message": "Invalid credentials"}, status=status.HTTP_404_NOT_FOUND)
+                     
+            user= EmailValidation.objects.get(email=email)
+            if user.code != code:
+                return Response({"message": "wrong code" }, status=status.HTTP_404_NOT_FOUND)
+            user_info.is_active = True
+            user_info.save()
+            return Response(data={"message": "go to login", f"{user_info.username} is_active": user_info.is_active}, status=status.HTTP_200_OK)
 
 
 class LogoutView(GenericAPIView):
