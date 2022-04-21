@@ -45,12 +45,12 @@ class LoginView(APIView):
         username = serializer.validated_data.get("username")
         password = serializer.validated_data.get("password")
         user = CustomUser.objects.filter(Q(username=username)|Q(email=username)).first()
-        user_obj = CustomUser.objects.get(Q(username=username)|Q(email=username))
+        #user_obj = CustomUser.objects.get(Q(username=username)|Q(email=username))
         if not user:
             return Response({"message": "invalid username or email"}, status=status.HTTP_404_NOT_FOUND)
         if not check_password(password, user.password):
             return Response({"message": "wrong password"}, status=status.HTTP_404_NOT_FOUND)
-        if not user_obj.is_active:
+        if not user.is_active:
             return Response({"message": "validate your email"}, status=status.HTTP_403_FORBIDDEN)
         access_tk = str(AccessToken.for_user(user))
         refresh_tk = str(RefreshToken.for_user(user))
@@ -64,6 +64,10 @@ class EmailActivisionView(APIView):
         user_data = serializer.data
         code = serializer.validated_data.get("code")
         email = serializer.validated_data.get("email")
+        if not (CustomUser.objects.filter(Q(email=email))):
+                if not (CustomUser.objects.filter(Q(username=email))):
+                    return Response({"message": "Invalid email or username" }, status=status.HTTP_404_NOT_FOUND)
+                email = CustomUser.objects.filter(Q(username=email)).first().email
         user= EmailValidation.objects.get(email=email)
         #user_code= EmailValidation.objects.get(code=user_data.get("code"))
         if user.code != code:
