@@ -56,3 +56,28 @@ class TestLogin(Test_SetUp):
         }
         res = self.client.post(self.login_url,data,format='json')
         self.assertEqual(res.status_code,404)
+
+    
+    def test_user_can_login_with_verified_email(self):
+        user = get_user_model().objects.create_user(
+            username=self.user_data['username'],
+            password=self.user_data['password'],
+            phone_number=self.user_data['phone_number'],
+            address=self.user_data['address'],
+            email=self.user_data['email'],
+            name=self.user_data['name'],
+            is_active=True
+        )
+        data = {
+            "username": self.user_data['username'],
+            "password":self.user_data['password'],
+        }
+        data2 = {
+            "username": self.user_data['email'],
+            "password":self.user_data['password'],
+        }
+        res = self.client.post(self.login_url,data,format='json')
+        self.assertEqual(res.status_code, 200)
+
+        res = self.client.post(self.login_url,data2,format='json')
+        self.assertEqual(res.status_code, 200)
