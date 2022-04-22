@@ -8,6 +8,7 @@ class Test_SetUp(APITestCase):
 
     def setUp(self):
         self.fake = Faker()
+        self.regiater_url= reverse('register')
 
         self.user_data = {
             "username": "ali" ,
