@@ -9,6 +9,7 @@ class Test_SetUp(APITestCase):
     def setUp(self):
         self.fake = Faker()
         self.register_url= reverse('register')
+        self.login_url= reverse('login')
 
         self.user_data = {
             "username": self.fake.email().split('@')[0],
