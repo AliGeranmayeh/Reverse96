@@ -1,15 +1,17 @@
 from .test_setUp import Test_SetUp
 from django.contrib.auth import get_user_model
+from faker import Faker
+from random import randint
 
 class TestRegister(Test_SetUp):
     def test_user_cannot_register_with_no_data(self):
         #register_url= "api/register/"
-        response = self.client.post(self.regiater_url)
+        response = self.client.post(self.register_url)
         #import pdb; pdb.set_trace()
         self.assertEqual(response.status_code, 400)
 
     def test_user_can_register_correctly(self):
-        res= self.client.post(self.regiater_url,self.user_data,format='json')
+        res= self.client.post(self.register_url,self.user_data,format='json')
         #import pdb; pdb.set_trace()
         self.assertEqual(res.data['message']['username'], self.user_data['username'])
         self.assertEqual(res.data['message']['email'], self.user_data['email'])
@@ -29,5 +31,21 @@ class TestRegister(Test_SetUp):
             name=self.user_data['name'],
             is_active=self.user_data['is_active']
         )
-        res= self.client.post(self.regiater_url,self.user_data,format='json')
+        res= self.client.post(self.register_url,self.user_data,format='json')
+        self.assertEqual(res.status_code,400)
+
+    
+    def test_user_haveto_fill_required_fields(self):
+        fake = Faker()
+        data = {
+            #"username": self.fake.email().split('@')[0],
+            #"email": self.fake.email(),
+            "password": "12345",
+            "address": fake.address(),
+            "name": fake.name(),
+            "phone_number": randint(1000000000, 9999999999),
+            "is_active":True
+        }
+
+        res = self.client.post(self.register_url,data,format='json')
         self.assertEqual(res.status_code,400)
