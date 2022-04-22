@@ -10,7 +10,7 @@ class Test_SetUp(APITestCase):
         self.fake = Faker()
         self.register_url= reverse('register')
         self.login_url= reverse('login')
-
+        self.email_verification_url= reverse('email-activision')
         self.user_data = {
             "username": self.fake.email().split('@')[0],
             "email": self.fake.email(),
