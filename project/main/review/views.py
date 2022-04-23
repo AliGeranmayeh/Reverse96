@@ -1,4 +1,5 @@
 
+from functools import partial
 from django.shortcuts import render
 from rest_framework.views import APIView
 
@@ -15,23 +16,21 @@ from rest_framework.generics import GenericAPIView
 class user_review(APIView):
     permissions = [permissions.IsAuthenticated]
     def post(self,request):
-        print(request.user)
         data=request.data
-        if("picture" in data):
-            serializer_data={
-                "address": data["address"],
-                "name":data["name"],
-                "user":request.user,
-                "picture":data["picture"]
-            }
-        else:
-            serializer_data={
-                "address": data["address"],
-                "name":data["name"],
-                "user":request.user
-            }
-
-        serializer = review_serializer(data=serializer_data)
+        # if("picture" in data):
+        #     serializer_data={
+        #         "address": data["address"],
+        #         "name":data["name"],
+        #         "user":request.user,
+        #         "picture":data["picture"]
+        #     }
+        # else:
+        #     serializer_data={
+        #         "address": data["address"],
+        #         "name":data["name"],
+        #         "user":request.user
+        #     }
+        serializer = review_serializer(data=request.data,partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
