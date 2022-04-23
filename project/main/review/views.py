@@ -42,3 +42,14 @@ class add_location_api(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
+
+class get_location_api(APIView):
+    def get(self,request,pk=None):
+        loc=location.objects.filter(id=pk)
+        serializer = location_serializer(loc, many=False)
+        if(not loc):
+            return Response({'message':"location does not exist"} ,status=status.HTTP_404_NOT_FOUND)
+        else:
+            existed_public_user_info = location.objects.get(username=pk)
+            serializer = location_serializer(existed_public_user_info, many=False)
+            return Response({'message': serializer.data},status=status.HTTP_200_OK)
