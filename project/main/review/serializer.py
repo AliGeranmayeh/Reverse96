@@ -9,7 +9,7 @@ from .models import locations, places
 class review_serializer(serializers.ModelSerializer):
     class Meta:
         model = places
-        fields = ['id', 'name', 'user', 'address', 'picture', 'date_created','location']
+        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location']
 class location_serializer(serializers.ModelSerializer):
     class Meta:
         model = locations
