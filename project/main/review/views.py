@@ -2,8 +2,8 @@
 from functools import partial
 from django.shortcuts import render
 from rest_framework.views import APIView
-
-from .serializer import review_serializer
+from models import location
+from .serializer import review_serializer, location_serializer
 from rest_framework.response import Response
 from .models import places
 from rest_framework import permissions, status
@@ -34,4 +34,11 @@ class user_review(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
-        
+
+class add_location_api(APIView):
+    def post(self,request):
+        data=request.data
+        serializer = location_serializer(data=request.data,partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
