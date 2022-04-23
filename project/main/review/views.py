@@ -2,10 +2,9 @@
 from functools import partial
 from django.shortcuts import render
 from rest_framework.views import APIView
-from models import location
 from .serializer import review_serializer, location_serializer
 from rest_framework.response import Response
-from .models import places
+from .models import places,locations
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.db.models import Q
