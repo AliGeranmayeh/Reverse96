@@ -1,13 +1,12 @@
 
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import review_serializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer
+from .serializer import review_serializer
 from rest_framework.response import Response
-from .models import CustomUser,EmailValidation
+from .models import places
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.db.models import Q
-from django.conf import settings
 from django.core.mail import send_mail
 from rest_framework.generics import GenericAPIView
 
