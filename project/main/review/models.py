@@ -1,6 +1,5 @@
 from operator import mod
 from re import T
-from tkinter.tix import Tree
 from unicodedata import name
 from django.db import models
 from user.models import CustomUser
@@ -22,4 +21,3 @@ class places(models.Model):
     date_created=models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.id
-
