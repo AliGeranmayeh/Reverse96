@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer, UserEditProfileSerializer
+from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer, UserEditProfileSerializer, ChangePasswordSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .models import CustomUser,EmailValidation
@@ -115,6 +115,16 @@ class UserEditProfileView(APIView):
     def patch(self, request):
         user = request.user
         serializer = UserEditProfileSerializer(user, request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": serializer.data}, status=status.HTTP_205_RESET_CONTENT)
+
+class ChangePasswordView(generics.UpdateAPIView):
+    permissions = [permissions.IsAuthenticated]
+
+    def patch(self, request):
+        user = request.user
+        serializer = ChangePasswordSerializer(user, request.data, partial=True, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": serializer.data}, status=status.HTTP_205_RESET_CONTENT)
