@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer
+from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer, UserEditProfileSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .models import CustomUser,EmailValidation
@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from random import seed
 from random import randint
 from rest_framework.generics import GenericAPIView
+from rest_framework import permissions
 
 def randomNumber():
     value = randint(1000, 9999)
@@ -82,7 +83,13 @@ class EmailActivisionView(APIView):
 
 class LogoutView(GenericAPIView):
     serializer_class = RefreshTokenSerializer
-    permissions = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def post(self, request, *args):
         serializer = self.get_serializer(data=request.data)
@@ -100,3 +107,14 @@ class PublicProfileView(APIView):
             existed_public_user_info = CustomUser.objects.get(username=pk)
             serializer = PublicProfileSerializer(existed_public_user_info, many=False)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
+
+
+class UserEditProfileView(APIView):
+    permissions = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    def patch(self, request):
+        user = request.user
+        serializer = UserEditProfileSerializer(user, request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": serializer.data}, status=status.HTTP_205_RESET_CONTENT)
