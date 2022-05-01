@@ -59,3 +59,18 @@ class PublicProfileSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['username', 'email',  'name', 'address',
                   'is_active', 'phone_number', 'picture']
+
+class UserEditProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'name', 'phone_number', 'address',
+                  'is_private_person', 'is_book_store', 'profile_image']
+
+        def validate_username(self, value):
+            if CustomUser.objects.filter(username=value).exists():
+                raise serializers.ValidationError("This username already exists!.")
+            return value
+
+        def update(self, validated_data):
+            instance = self.Meta.model(**validated_data)
+            return instance
