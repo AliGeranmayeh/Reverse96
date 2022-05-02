@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'user',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
-    'review'
+    'rest_framework',
+    'review',
 ]
 
 MIDDLEWARE = [
@@ -112,7 +113,11 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+     ],
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
