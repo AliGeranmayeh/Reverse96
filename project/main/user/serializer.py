@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import CustomUser, EmailValidation
 from django.utils.text import gettext_lazy
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from django.contrib.auth.password_validation import validate_password
+
 
 class LoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True, allow_null=False, allow_blank=False)

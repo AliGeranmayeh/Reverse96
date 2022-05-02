@@ -4,7 +4,7 @@ from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSeri
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .models import CustomUser,EmailValidation
-from rest_framework import permissions, status
+from rest_framework import permissions, status, generics
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.db.models import Q
 from django.contrib.auth.hashers import check_password
@@ -14,6 +14,7 @@ from random import seed
 from random import randint
 from rest_framework.generics import GenericAPIView
 from rest_framework import permissions
+from rest_framework.parsers import MultiPartParser, FormParser
 
 def randomNumber():
     value = randint(1000, 9999)
@@ -83,7 +84,7 @@ class EmailActivisionView(APIView):
 
 class LogoutView(GenericAPIView):
     serializer_class = RefreshTokenSerializer
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args):
         serializer = self.get_serializer(data=request.data)
