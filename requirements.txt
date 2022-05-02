@@ -6,6 +6,9 @@ faker==13.3.4
 django-cors-headers==3.11.0
 markdown==3.3.4
 django-filter==21.1
+psycopg2==2.9.1
+django-environ==0.4.5
+
 
 
 

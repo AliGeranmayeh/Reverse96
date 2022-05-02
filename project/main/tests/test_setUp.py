@@ -8,15 +8,17 @@ class Test_SetUp(APITestCase):
 
     def setUp(self):
         self.fake = Faker()
-
+        self.register_url= reverse('register')
+        self.login_url= reverse('login')
+        self.email_verification_url= reverse('email-activision')
         self.user_data = {
-            "username": "ali" ,
+            "username": self.fake.email().split('@')[0],
             "email": self.fake.email(),
             "password": "12345",
             "address": self.fake.address(),
             "name": self.fake.name(),
             "phone_number": randint(1000000000, 9999999999),
-            "is_active":"True"
+            "is_active":True
         }
 
         return super().setUp()

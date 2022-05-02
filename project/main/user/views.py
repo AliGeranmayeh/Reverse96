@@ -1,3 +1,4 @@
+from functools import partial
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer, UserEditProfileSerializer, ChangePasswordSerializer
