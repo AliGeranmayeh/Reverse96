@@ -50,6 +50,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'review',
+    'fluent_comments',
+    'threadedcomments',
+    'django_comments',
 ]
 
 MIDDLEWARE = [
