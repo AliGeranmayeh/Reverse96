@@ -21,12 +21,3 @@ class places(models.Model):
     date_created=models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.id
-
-
-class Poll(models.Model):
-    places = models.ForeignKey(places, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    details = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.title

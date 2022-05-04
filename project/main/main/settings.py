@@ -51,9 +51,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'review',
-    'fluent_comments',
-    'threadedcomments',
-    'django_comments',
 ]
 
 MIDDLEWARE = [
@@ -90,10 +87,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'main.wsgi.application'
 
-COMMENTS_APP = 'fluent_comments'
-FLUENT_COMMENTS_FORM_CLASS = 'fluent_comments.forms.CompactLabelsCommentForm'
-FLUENT_COMMENTS_EXCLUDE_FIELDS = ('name', 'email', 'url', 'title')
-SITE_ID = 1
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
