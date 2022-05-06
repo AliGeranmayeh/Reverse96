@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer,RateViewSerializer,RateSerializer
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
-from .models import places,locations, Comment
+from .models import places,locations, Comment,Rate
 from user.models import CustomUser
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
@@ -12,6 +12,7 @@ from django.db.models import Q
 from django.core.mail import send_mail
 from rest_framework.generics import GenericAPIView
 from rest_framework import permissions
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 class user_review(APIView):
@@ -101,13 +102,14 @@ class SubmitCommentAPI(APIView):
             return Response({'message': "comment submited "}, status=status.HTTP_201_CREATED)
 
 
-class ViewRateView(ListAPIView):
+class ViewRateView(APIView):
     serializer_class = RateViewSerializer
 
     def get(self, request, pk=None):
-        RateViewSerializer(placees_info, many=False)
-        list_of_all_rates = Rate.objects.filter(place__exact=places.objects.filter(id=pk))
-        if not placees_info:
+        place_info =get_object_or_404(places,id=pk)
+        RateViewSerializer(place_info, many=False)
+        list_of_all_rates = Rate.objects.filter(place=places.objects.get(id=pk))
+        if not place_info:
             return Response({'message': "place does not exist"}, status=status.HTTP_404_NOT_FOUND)
         else:
             saved_list = []
@@ -126,22 +128,3 @@ class ViewRateView(ListAPIView):
                 content = {"detail": "No user rated yet"}
                 return Response(content, status=status.HTTP_204_NO_CONTENT)
 
-
-    def get(self , request , *args , **kwargs):
-        getBookid = self.kwargs['BookID']
-        list_of_all_rates = BookRate.objects.filter(Book__exact=getBookid)
-        saved_list = []
-        for rates in list_of_all_rates:
-            saved_list.append(rates.rate)
-        sum = 0
-        length_of_int =len(saved_list)
-        if length_of_int !=0:
-            for i in saved_list:
-                sum += i
-            sum =sum/length_of_int
-
-            content = {"average":sum}
-            return Response(content,status=status.HTTP_200_OK)
-        else:
-            content = {"detail":"No user rated yet"}
-            return Response(content , status = status.HTTP_204_NO_CONTENT)
