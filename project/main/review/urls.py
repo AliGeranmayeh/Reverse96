@@ -9,5 +9,6 @@ urlpatterns = [
     path('add_location', views.add_location_api.as_view(), name="add_location_api"),
     #path('comment', views.CommentView.as_view(), name="create-new-comment"),
     #path('poll', views.PollView.as_view(), name="retrieve-poll-objs"),
+    path('comments/<str:pk>', views.CommentViewAPI.as_view(), name="all-comments"),
 
 ]
