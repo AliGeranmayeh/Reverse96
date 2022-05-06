@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 
-from .models import locations, places, Comment
+from .models import locations, places, Comment,Rate
 
 
 class review_serializer(serializers.ModelSerializer):
@@ -37,3 +37,8 @@ class CommentCreationSerializer(serializers.Serializer):
         fields = ['author', 'place', 'comment_text']
 
 
+class RateViewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Rate
+        fields = '__all__'
