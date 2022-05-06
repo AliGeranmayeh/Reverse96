@@ -23,7 +23,7 @@ class places(models.Model):
         return str(self.id)
 
 class Comment(models.Model):
-    place = models.ForeignKey(places, unique=True, on_delete=models.CASCADE)
+    place = models.ForeignKey(places, on_delete=models.CASCADE)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     comment_text = models.TextField(default='user comment')
 
