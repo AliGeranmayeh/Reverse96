@@ -31,6 +31,7 @@ class RecursiveField(serializers.Serializer):
         return serializer.data
 
 class CommentCreationSerializer(serializers.Serializer):
+    comment_text = serializers.RegexField('')
     class Meta:
         model = Comment
         fields = ['author', 'place', 'comment_text']
