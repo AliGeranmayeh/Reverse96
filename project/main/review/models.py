@@ -29,3 +29,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return '"' + str(self.author)+ '"' + '`s Comment On ' + '<<' + str(self.place) + ">>"
+
+
+class Rate(models.Model):
+    user = models.ForeignKey(CustomUser, related_name='user_who_rated', on_delete=models.CASCADE)
+    place = models.ForeignKey(places, on_delete=models.CASCADE)
+    rate = models.IntegerField(blank=True, default=0)
