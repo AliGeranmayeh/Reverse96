@@ -1,7 +1,7 @@
 from functools import partial
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer
+from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer,RateViewSerializer,RateSerializer
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
 from .models import places,locations, Comment
@@ -99,3 +99,49 @@ class SubmitCommentAPI(APIView):
                                       comment_text=serializer.validated_data.get("comment_text"))
             CommentInstance.save()
             return Response({'message': "comment submited "}, status=status.HTTP_201_CREATED)
+
+
+class ViewRateView(ListAPIView):
+    serializer_class = RateViewSerializer
+
+    def get(self, request, pk=None):
+        RateViewSerializer(placees_info, many=False)
+        list_of_all_rates = Rate.objects.filter(place__exact=places.objects.filter(id=pk))
+        if not placees_info:
+            return Response({'message': "place does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            saved_list = []
+            for rates in list_of_all_rates:
+                saved_list.append(rates.rate)
+            sum = 0
+            length_of_int = len(saved_list)
+            if length_of_int != 0:
+                for i in saved_list:
+                    sum += i
+                sum = sum / length_of_int
+
+                content = {"average": sum}
+                return Response(content, status=status.HTTP_200_OK)
+            else:
+                content = {"detail": "No user rated yet"}
+                return Response(content, status=status.HTTP_204_NO_CONTENT)
+
+
+    def get(self , request , *args , **kwargs):
+        getBookid = self.kwargs['BookID']
+        list_of_all_rates = BookRate.objects.filter(Book__exact=getBookid)
+        saved_list = []
+        for rates in list_of_all_rates:
+            saved_list.append(rates.rate)
+        sum = 0
+        length_of_int =len(saved_list)
+        if length_of_int !=0:
+            for i in saved_list:
+                sum += i
+            sum =sum/length_of_int
+
+            content = {"average":sum}
+            return Response(content,status=status.HTTP_200_OK)
+        else:
+            content = {"detail":"No user rated yet"}
+            return Response(content , status = status.HTTP_204_NO_CONTENT)

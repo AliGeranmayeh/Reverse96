@@ -11,5 +11,7 @@ urlpatterns = [
     #path('poll', views.PollView.as_view(), name="retrieve-poll-objs"),
     path('comments/<str:pk>', views.CommentViewAPI.as_view(), name="all-comments"),
     path('comment/<str:pk>', views.SubmitCommentAPI.as_view(), name="add-comment"),
+    path('rates/<str:pk>', views.ViewRateView.as_view(), name="all-rates"),
+
 
 ]
