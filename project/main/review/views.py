@@ -120,11 +120,35 @@ class ViewRateView(APIView):
             if length_of_int != 0:
                 for i in saved_list:
                     sum += i
-                sum = sum / length_of_int
 
-                content = {"average": sum}
+
+                content = {"Likes": sum}
                 return Response(content, status=status.HTTP_200_OK)
             else:
                 content = {"detail": "No user rated yet"}
                 return Response(content, status=status.HTTP_204_NO_CONTENT)
+
+
+class RateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = RateSerializer
+
+    def post(self,request,pk=None):
+        serializer = self.serializer_class(data=request.data)
+        print(request.data)
+        serializer.is_valid()
+        place_info = get_object_or_404(places, id=pk)
+        current_rate = serializer.validated_data.get("rate")
+        print(current_rate)
+        RateViewSerializer(place_info, many=False)
+        user = CustomUser.objects.get(username=request.user.username)
+        place = places.objects.get(id=pk)
+        #rate = Rate.objects.get(user=user, place=place)
+        #rate.rate += 1
+        new_rate = current_rate+1
+        rate = Rate(user=user, place=place, rate=1)
+        rate.save()
+        content = {'place': places.title, 'user': user.username,
+                   'detail': 'successfully added rate for place'}
+        return Response(content, status=status.HTTP_201_CREATED)
 

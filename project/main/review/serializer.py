@@ -45,7 +45,7 @@ class RateViewSerializer(serializers.ModelSerializer):
 
 
 class RateSerializer(serializers.ModelSerializer):
-
+    rate = serializers.IntegerField(required=True)
     class Meta:
         model = Rate
         fields = '__all__'

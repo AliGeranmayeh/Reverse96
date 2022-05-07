@@ -12,6 +12,7 @@ urlpatterns = [
     path('comments/<str:pk>', views.CommentViewAPI.as_view(), name="all-comments"),
     path('comment/<str:pk>', views.SubmitCommentAPI.as_view(), name="add-comment"),
     path('rates/<str:pk>', views.ViewRateView.as_view(), name="all-rates"),
+    path('rate/<str:pk>', views.RateView.as_view(), name="add-rate"),
 
 
 ]
