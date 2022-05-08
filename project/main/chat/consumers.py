@@ -55,6 +55,40 @@ class ChatConsumer(WebsocketConsumer):
 
 
 
+
+    def messages_to_json(self, messages):
+        result = []
+        for message in messages:
+            result.append(self.message_to_json(message))
+        return result
+
+    def message_to_json(self, message):
+        if message.reply is None:
+            return {
+                'id': message.id,
+                'author': message.contact.user.username,
+                'content': message.content,
+                'timestamp': str(message.timestamp)
+        }
+        else:
+            return {
+                'id': message.id,
+                'author': message.contact.user.username,
+                'content': message.content,
+                'timestamp': str(message.timestamp),
+                'reply':message.reply.content
+        }
+
+    commands = {
+        'fetch_messages': fetch_messages,
+        'new_message': new_message,
+        'edit_message': edit_message,
+        'delete_message':delete_message,
+        'set_flag':flag_message,
+        'fetch_unseen_messages':fetch_unseen_messages,
+        'set_seen_messages':set_seen_messages
+    }
+
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
