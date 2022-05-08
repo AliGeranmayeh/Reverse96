@@ -9,7 +9,7 @@ class locations(models.Model):
     long=models.DecimalField(max_digits=9, decimal_places=6)
     latt=models.DecimalField(max_digits=9, decimal_places=6)
     def __str__(self):
-        return self.id    
+        return str(self.id)
 
 class places(models.Model):
     title=models.CharField(max_length=300)
@@ -20,4 +20,18 @@ class places(models.Model):
     location=models.ForeignKey(locations,on_delete=models.CASCADE)
     date_created=models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.id
+        return str(self.id)
+
+class Comment(models.Model):
+    place = models.ForeignKey(places, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    comment_text = models.TextField(default='user comment')
+
+    def __str__(self):
+        return '"' + str(self.author)+ '"' + '`s Comment On ' + '<<' + str(self.place) + ">>"
+
+
+class Rate(models.Model):
+    user = models.ForeignKey(CustomUser, related_name='user_who_rated', on_delete=models.CASCADE)
+    place = models.ForeignKey(places, on_delete=models.CASCADE)
+    rate = models.IntegerField(blank=True, default=0)
