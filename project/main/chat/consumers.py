@@ -23,4 +23,12 @@ class ChatConsumer(WebsocketConsumer):
         print(content)
         return self.send_message(content)
 
-
+    def fetch_unseen_messages(self,data):
+        user_contact = get_user_contact(data['from'])
+        messages=get_unseen_messages(data['chatId'],user_contact)
+        content = {
+            'command': 'messages',
+            'messages': self.messages_to_json(messages)
+        }
+        print(content)
+        return    self.send_message(content)
