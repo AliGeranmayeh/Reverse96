@@ -53,7 +53,28 @@ class ChatConsumer(WebsocketConsumer):
         }
         return self.send_chat_message(content)
 
+    def set_seen_messages(self,data):
+        contact_user=get_user_contact(data['from'])
+        messages=get_unseen_messages(data['chatId'],contact_user)
+        print(messages)
+        for msg in messages:
+            msg.flag=True
+            msg.save(update_fields=['flag'])
+            print(msg)
+        
+    def flag_message(self,data):
+        message=get_reply_message(data['chatId'],data['id'])
+        message.flag=True
+        message.save(update_fields=['flag'])
 
+    def edit_message(self, data):
+        message=get_reply_message(data['chatId'],data['id'])
+        message.content=data['message']
+        message.save(update_fields=['content'])
+    
+    def delete_message(self, data):
+        message=get_reply_message(data['chatId'],data['id'])
+        message.delete()
 
 
     def messages_to_json(self, messages):
