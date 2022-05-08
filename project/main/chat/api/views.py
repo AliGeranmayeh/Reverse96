@@ -7,7 +7,7 @@ from rest_framework.generics import (
     DestroyAPIView,
     UpdateAPIView
 )
-from chat.models import Chat, Contact
+from chat.models import Chat
 from chat.views import get_user_contact
 from .serializers import ChatSerializer
 

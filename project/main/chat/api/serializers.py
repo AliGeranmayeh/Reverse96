@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from chat.models import Chat, Contact
+from chat.models import Chat
 from chat.views import get_user_contact
 
 

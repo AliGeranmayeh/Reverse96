@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404
-from .models import Chat, Contact, Message
+from .models import Chat,  Message
+from user.models import CustomUser
 from django.db.models import Q
 
 User = get_user_model()
@@ -17,7 +18,7 @@ def get_unseen_messages(chatId, Mfrom):
 
 def get_user_contact(username):
     user = get_object_or_404(User, username=username)
-    return get_object_or_404(Contact, user=user)
+    return get_object_or_404(CustomUser, user=user)
 
 def get_reply_message(chatId,Mid):
     chat = get_object_or_404(Chat, id=chatId)
