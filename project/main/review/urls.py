@@ -5,6 +5,8 @@ from rest_framework_simplejwt import views as jwt_views
 
 urlpatterns = [
     path('review', views.user_review.as_view(), name="user_review"),
+    path('get_user_reviews', views.get_user_reviews.as_view(), name="get_user_reviews"),
+    path('delete_user_reviews/<str:pk>', views.delete_user_reviews.as_view(), name="delete_user_reviews"),
     path('get_location/<str:pk>', views.get_location_api.as_view(), name="get_location_api"),
     path('add_location', views.add_location_api.as_view(), name="add_location_api"),
     #path('comment', views.CommentView.as_view(), name="create-new-comment"),
@@ -12,7 +14,7 @@ urlpatterns = [
     path('comments/<str:pk>', views.CommentViewAPI.as_view(), name="all-comments"),
     path('comment/<str:pk>', views.SubmitCommentAPI.as_view(), name="add-comment"),
     path('rates/<str:pk>', views.ViewRateView.as_view(), name="all-rates"),
-    path('rate/<str:pk>', views.RateView.as_view(), name="add-rate"),
+    #path('rate/<str:pk>', views.RateView.as_view(), name="add-rate"),
 
 
 ]

@@ -1,19 +1,22 @@
+from turtle import title
 from urllib import request
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework.fields import CurrentUserDefault
 
-
-from .models import locations, places, Comment,Rate
+from .models import locations, places, Comment
 
 
 class review_serializer(serializers.ModelSerializer):
     class Meta:
         model = places
         fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location']
+
+
 class location_serializer(serializers.ModelSerializer):
     class Meta:
         model = locations
-        fields = ['id', 'long', 'latt']
+        fields = '__all__'
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -37,15 +40,3 @@ class CommentCreationSerializer(serializers.Serializer):
         fields = ['author', 'place', 'comment_text']
 
 
-class RateViewSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Rate
-        fields = '__all__'
-
-
-class RateSerializer(serializers.ModelSerializer):
-    rate = serializers.IntegerField(required=True)
-    class Meta:
-        model = Rate
-        fields = '__all__'

@@ -1,10 +1,12 @@
+from ast import Delete
 from functools import partial
+from logging import raiseExceptions
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer,RateViewSerializer,RateSerializer
+from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
-from .models import places,locations, Comment,Rate
+from .models import places,locations, Comment
 from user.models import CustomUser
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
@@ -13,12 +15,15 @@ from django.core.mail import send_mail
 from rest_framework.generics import GenericAPIView
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # Create your views here.
 class user_review(APIView):
     permissions = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
     def post(self,request):
         data=request.data
+        data["user"]=request.user.id
         # if("picture" in data):
         #     serializer_data={
         #         "address": data["address"],
@@ -37,7 +42,24 @@ class user_review(APIView):
         serializer.save()
         return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
 
+class get_user_reviews(APIView):
+    permissions = [permissions.IsAuthenticated]
+    def get(self,requst):
+        reviews=places.objects.filter(user=requst.user.id)
+        serializer=review_serializer(reviews,many=True)
+        return Response({"message": serializer.data}, status=status.HTTP_200_OK)
+
+class delete_user_reviews(APIView):
+    permissions=[permissions.IsAuthenticated]
+    def delete(self,request,pk):
+        task = places.objects.get(id=pk)
+        task.delete()
+        return Response({"message": "item seuccesfuly deleted!"}, status=status.HTTP_200_OK)
+    
+
 class add_location_api(APIView):
+    permissions = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
     def post(self,request):
         data=request.data
         serializer = location_serializer(data=request.data,partial=True)
@@ -103,52 +125,44 @@ class SubmitCommentAPI(APIView):
 
 
 class ViewRateView(APIView):
-    serializer_class = RateViewSerializer
 
     def get(self, request, pk=None):
         place_info =get_object_or_404(places,id=pk)
-        RateViewSerializer(place_info, many=False)
-        list_of_all_rates = Rate.objects.filter(place=places.objects.get(id=pk))
+        place=places.objects.get(id=pk)
         if not place_info:
             return Response({'message': "place does not exist"}, status=status.HTTP_404_NOT_FOUND)
         else:
-            saved_list = []
-            for rates in list_of_all_rates:
-                saved_list.append(rates.rate)
-            sum = 0
+            saved_list=place.liked_by
+            print(saved_list)
             length_of_int = len(saved_list)
             if length_of_int != 0:
-                for i in saved_list:
-                    sum += i
 
-
-                content = {"Likes": sum}
+                content = {"Likes": length_of_int, "users": saved_list}
                 return Response(content, status=status.HTTP_200_OK)
             else:
-                content = {"detail": "No user rated yet"}
+                content = {"likes": length_of_int}
                 return Response(content, status=status.HTTP_204_NO_CONTENT)
 
 
-class RateView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = RateSerializer
+# class RateView(APIView):
+#     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self,request,pk=None):
-        serializer = self.serializer_class(data=request.data)
-        print(request.data)
-        serializer.is_valid()
-        place_info = get_object_or_404(places, id=pk)
-        current_rate = serializer.validated_data.get("rate")
-        print(current_rate)
-        RateViewSerializer(place_info, many=False)
-        user = CustomUser.objects.get(username=request.user.username)
-        place = places.objects.get(id=pk)
-        #rate = Rate.objects.get(user=user, place=place)
-        #rate.rate += 1
-        new_rate = current_rate+1
-        rate = Rate(user=user, place=place, rate=1)
-        rate.save()
-        content = {'place': places.title, 'user': user.username,
-                   'detail': 'successfully added rate for place'}
-        return Response(content, status=status.HTTP_201_CREATED)
+#     def post(self,request,pk=None):
+#         serializer = self.serializer_class(data=request.data)
+#         print(request.data)
+#         serializer.is_valid()
+#         place_info = get_object_or_404(places, id=pk)
+#         current_rate = serializer.validated_data.get("rate")
+#         print(current_rate)
+#         RateViewSerializer(place_info, many=False)
+#         user = CustomUser.objects.get(username=request.user.username)
+#         place = places.objects.get(id=pk)
+#         #rate = Rate.objects.get(user=user, place=place)
+#         #rate.rate += 1
+#         new_rate = current_rate+1
+#         rate = Rate(user=user, place=place, rate=1)
+#         rate.save()
+#         content = {'place': places.title, 'user': user.username,
+#                    'detail': 'successfully added rate for place'}
+#         return Response(content, status=status.HTTP_201_CREATED)
 
