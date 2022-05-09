@@ -110,6 +110,17 @@ class PublicProfileView(APIView):
             serializer = PublicProfileSerializer(existed_public_user_info, many=False)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
+class get_user_detail(APIView):
+    permissions = [permissions.IsAuthenticated]
+    def get(self,request):
+        user=request.user
+        if (not user):
+            return Response({'message':"user does not exist"} ,status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = PublicProfileSerializer(CustomUser.objects.get(username=user.username), many=False)
+            return Response({'message': serializer.data},status=status.HTTP_200_OK)
+
+
 
 class UserEditProfileView(APIView):
     permissions = [permissions.IsAuthenticated]
@@ -120,6 +131,7 @@ class UserEditProfileView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": serializer.data}, status=status.HTTP_205_RESET_CONTENT)
+
 
 class ChangePasswordView(generics.UpdateAPIView):
     permissions = [permissions.IsAuthenticated]
