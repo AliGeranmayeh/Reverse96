@@ -1,3 +1,4 @@
+from unicodedata import name
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import tree
@@ -27,6 +28,7 @@ class Message(models.Model):
 
 
 class Chat(models.Model):
+    name=models.CharField(max_length=300, null=True, blank=True)
     participants = models.ManyToManyField(
         CustomUser, related_name='chats', blank=True)
     messages = models.ManyToManyField(Message, blank=True)

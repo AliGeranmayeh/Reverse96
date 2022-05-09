@@ -5,16 +5,21 @@ from chat.views import get_user_contact
 
 
 class ContactSerializer(serializers.StringRelatedField):
+    name=serializers.CharField()
+    def to_internal_value(self, value):
+        return value
+
+class nameSerializer(serializers.StringRelatedField):
     def to_internal_value(self, value):
         return value
 
 
+
 class ChatSerializer(serializers.ModelSerializer):
     participants = ContactSerializer(many=True)
-
     class Meta:
         model = Chat
-        fields = ('id', 'messages', 'participants')
+        fields = ('id', 'messages', 'participants', 'name')
         read_only = ('id')
 
     def create(self, validated_data):
@@ -25,6 +30,7 @@ class ChatSerializer(serializers.ModelSerializer):
         for username in participants:
             contact = get_user_contact(username)
             chat.participants.add(contact)
+        chat.name=validated_data['name']
         chat.save()
         return chat
 
