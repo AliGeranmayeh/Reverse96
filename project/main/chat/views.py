@@ -18,7 +18,7 @@ def get_unseen_messages(chatId, Mfrom):
 
 def get_user_contact(username):
     user = get_object_or_404(User, username=username)
-    return get_object_or_404(CustomUser, user=user)
+    return get_object_or_404(User, username=username)
 
 def get_reply_message(chatId,Mid):
     chat = get_object_or_404(Chat, id=chatId)

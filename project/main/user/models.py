@@ -15,8 +15,6 @@ class CustomUser(AbstractUser):
     address = models.TextField()
     is_active = models.BooleanField(default=False)
     liked=models.ManyToManyField('review.places', related_name='liked', blank=True )
-    friends = models.ManyToManyField('self', blank=True)
-
     def __str__(self):
         return self.username
 
