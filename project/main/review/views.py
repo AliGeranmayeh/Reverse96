@@ -1,12 +1,13 @@
 from ast import Delete
 from functools import partial
 from logging import raiseExceptions
+from operator import truediv
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
-from .models import places,locations, Comment
+from .models import review,locations, Comment
 from user.models import CustomUser
 from rest_framework import permissions, status
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
@@ -18,6 +19,42 @@ from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
 
 # Create your views here.
+class get_map_location_view(APIView):
+    def get(self,request):
+        coordinates=request.data['coordinates']
+        map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
+            & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-rating')
+        serializer=location_serializer(map_locations,many=True)
+        return Response({'message': serializer.data},status=status.HTTP_200_OK)
+
+class get_map_location_view(APIView):
+    def get(self,request):
+        coordinates=request.data['coordinates']
+        map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
+            & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-rating')
+        serializer=location_serializer(map_locations,many=True)
+        return Response({'message': serializer.data},status=status.HTTP_200_OK)
+
+class get_reviews_api(APIView):
+    def get(self,request,pk=None):
+        if (pk=='1'):
+            reviews=review.objects.all().order_by('-date_created')
+            print(reviews)
+            serializer=review_serializer(reviews,many=True)
+            return Response({'message': serializer.data},status=status.HTTP_200_OK)
+        elif (pk=='2'):
+            reviews=review.objects.all().order_by('-liked_by')[:10]
+            serializer=review_serializer(reviews,many=True)
+            return Response({'message': serializer.data},status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
 class user_review(APIView):
     permissions = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -45,14 +82,14 @@ class user_review(APIView):
 class get_user_reviews(APIView):
     permissions = [permissions.IsAuthenticated]
     def get(self,requst):
-        reviews=places.objects.filter(user=requst.user.id)
+        reviews=review.objects.filter(user=requst.user.id)
         serializer=review_serializer(reviews,many=True)
         return Response({"message": serializer.data}, status=status.HTTP_200_OK)
 
 class delete_user_reviews(APIView):
     permissions=[permissions.IsAuthenticated]
     def delete(self,request,pk):
-        task = places.objects.get(id=pk)
+        task = review.objects.get(id=pk)
         task.delete()
         return Response({"message": "item seuccesfuly deleted!"}, status=status.HTTP_200_OK)
     
@@ -95,7 +132,7 @@ class CommentViewAPI(APIView):
     #permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk=None):
-        placees_info = places.objects.filter(id=pk)
+        placees_info = review.objects.filter(id=pk)
         CommentSerializer(placees_info, many=False)
 
         if not placees_info:
@@ -110,14 +147,14 @@ class SubmitCommentAPI(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk=None):
-        placees_info = places.objects.filter(id=pk)
+        placees_info = review.objects.filter(id=pk)
         serializer = self.serializer_class(data=request.data)
         CommentSerializer(placees_info, many=False)
         serializer.is_valid()
         if not placees_info:
             return Response({'message': "place does not exist"}, status=status.HTTP_404_NOT_FOUND)
         else:
-            CommentInstance = Comment(place=places.objects.get(id=pk),
+            CommentInstance = Comment(place=review.objects.get(id=pk),
                                       author=CustomUser.objects.get(username=request.user),
                                       comment_text=serializer.validated_data.get("comment_text"))
             CommentInstance.save()
@@ -127,8 +164,8 @@ class SubmitCommentAPI(APIView):
 class ViewRateView(APIView):
 
     def get(self, request, pk=None):
-        place_info =get_object_or_404(places,id=pk)
-        place=places.objects.get(id=pk)
+        place_info =get_object_or_404(review,id=pk)
+        place=review.objects.get(id=pk)
         if not place_info:
             return Response({'message': "place does not exist"}, status=status.HTTP_404_NOT_FOUND)
         else:
@@ -143,6 +180,10 @@ class ViewRateView(APIView):
                 content = {"likes": length_of_int}
                 return Response(content, status=status.HTTP_204_NO_CONTENT)
 
+        
+        
+        
+        
 
 # class RateView(APIView):
 #     permission_classes = [permissions.IsAuthenticated]
@@ -151,18 +192,18 @@ class ViewRateView(APIView):
 #         serializer = self.serializer_class(data=request.data)
 #         print(request.data)
 #         serializer.is_valid()
-#         place_info = get_object_or_404(places, id=pk)
+#         place_info = get_object_or_404(review, id=pk)
 #         current_rate = serializer.validated_data.get("rate")
 #         print(current_rate)
 #         RateViewSerializer(place_info, many=False)
 #         user = CustomUser.objects.get(username=request.user.username)
-#         place = places.objects.get(id=pk)
+#         place = review.objects.get(id=pk)
 #         #rate = Rate.objects.get(user=user, place=place)
 #         #rate.rate += 1
 #         new_rate = current_rate+1
 #         rate = Rate(user=user, place=place, rate=1)
 #         rate.save()
-#         content = {'place': places.title, 'user': user.username,
+#         content = {'place': review.title, 'user': user.username,
 #                    'detail': 'successfully added rate for place'}
 #         return Response(content, status=status.HTTP_201_CREATED)
 
