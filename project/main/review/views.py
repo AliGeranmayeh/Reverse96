@@ -4,7 +4,7 @@ from logging import raiseExceptions
 from operator import truediv
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer
+from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
 from .models import review,locations, Comment
@@ -19,21 +19,25 @@ from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
 
 # Create your views here.
-class get_map_location_view(APIView):
+class get_map_location_view1(APIView):
     def get(self,request):
         coordinates=request.data['coordinates']
         map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
-            & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-rating')
-        serializer=location_serializer(map_locations,many=True)
+            & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-no_of_likes')
+        serializer=location_review_serializer(map_locations,many=True)
         return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
 class get_map_location_view(APIView):
     def get(self,request):
         coordinates=request.data['coordinates']
         map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
-            & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-rating')
+            & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-no_of_likes')
         serializer=location_serializer(map_locations,many=True)
         return Response({'message': serializer.data},status=status.HTTP_200_OK)
+
+def get_location_from_id(locationid):
+    location=locations.objects.get(id=locationid)
+    return location
 
 class get_reviews_api(APIView):
     def get(self,request,pk=None):
@@ -43,7 +47,8 @@ class get_reviews_api(APIView):
             serializer=review_serializer(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         elif (pk=='2'):
-            reviews=review.objects.all().order_by('-liked_by')[:10]
+            reviews=review.objects.extra(select={'length':'length(liked_by)'}).order_by('length')[:10]
+            print(reviews)
             serializer=review_serializer(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         else:
@@ -109,12 +114,20 @@ class get_location_api(APIView):
         loc=locations.objects.filter(id=pk)
         serializer = location_serializer(loc, many=False)
         if(not loc):
-            return Response({'message':"location does not exist"} ,status=status.HTTP_404_NOT_FOUND)
+            return Response({'message':"location does not exist"} ,status=status.HTTP_204_NO_CONTENT)
         else:
             existed_public_user_info = locations.objects.get(id=pk)
             serializer = location_serializer(existed_public_user_info, many=False)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
-
+class get_location_reviews(APIView):
+    def get(self,request,pk=None):
+        reviews=review.objects.filter(location=pk)
+        serializer=review_serializer(reviews, many=True)
+        print(serializer.data)
+        if not reviews:
+            return Response({'message':"no reviews"} ,status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
 #class PublicProfileView(APIView):
 #   def get(self, request, pk=None):
