@@ -31,7 +31,7 @@ class get_map_location_view(APIView):
     def get(self,request):
         coordinates=request.data['coordinates']
         map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
-            & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-no_of_likes')
+            & Q(long__range=[coordinates[1],coordinates[3]]))
         serializer=location_serializer(map_locations,many=True)
         return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
