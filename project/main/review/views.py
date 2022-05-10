@@ -18,7 +18,10 @@ from rest_framework import permissions
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser
 
+#from project.main.review import serializer
+
 # Create your views here.
+#locatin in map fram with child reviews
 class get_map_location_view1(APIView):
     def get(self,request):
         coordinates=request.data['coordinates']
@@ -26,7 +29,7 @@ class get_map_location_view1(APIView):
             & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-no_of_likes')
         serializer=location_review_serializer(map_locations,many=True)
         return Response({'message': serializer.data},status=status.HTTP_200_OK)
-
+#location within map frame without child reviews
 class get_map_location_view(APIView):
     def get(self,request):
         coordinates=request.data['coordinates']
@@ -38,7 +41,7 @@ class get_map_location_view(APIView):
 def get_location_from_id(locationid):
     location=locations.objects.get(id=locationid)
     return location
-
+#for home page and trends side bar
 class get_reviews_api(APIView):
     def get(self,request,pk=None):
         if (pk=='1'):
@@ -53,13 +56,7 @@ class get_reviews_api(APIView):
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
+#adding reviews of a location
 class user_review(APIView):
     permissions = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -108,7 +105,7 @@ class add_location_api(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
-
+#gettin a single location with id
 class get_location_api(APIView):
     def get(self,request,pk=None):
         loc=locations.objects.filter(id=pk)
@@ -119,6 +116,7 @@ class get_location_api(APIView):
             existed_public_user_info = locations.objects.get(id=pk)
             serializer = location_serializer(existed_public_user_info, many=False)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
+# getting child reviews of a single location with its id           
 class get_location_reviews(APIView):
     def get(self,request,pk=None):
         reviews=review.objects.filter(location=pk)
@@ -165,7 +163,7 @@ class SubmitCommentAPI(APIView):
         CommentSerializer(placees_info, many=False)
         serializer.is_valid()
         if not placees_info:
-            return Response({'message': "place does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': "Review does not exist"}, status=status.HTTP_404_NOT_FOUND)
         else:
             CommentInstance = Comment(place=review.objects.get(id=pk),
                                       author=CustomUser.objects.get(username=request.user),
@@ -193,30 +191,21 @@ class ViewRateView(APIView):
                 content = {"likes": length_of_int}
                 return Response(content, status=status.HTTP_204_NO_CONTENT)
 
-        
-        
-        
-        
+#liking a riview
+class RateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-# class RateView(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
+    def post(self,request,pk=None):
+        user=CustomUser.objects.get(username=request.user.username)
+        liked_review=review.objects.get(id=pk)
+        print(liked_review.liked_by.filter())
+        if request.user in liked_review.liked_by.filter():
+            liked_review.liked_by.remove(request.user)
+            content = {'detail': 'successfully removed rate for place'}
+            return Response(content, status=status.HTTP_201_CREATED)
+        else:
+            liked_review.liked_by.add(request.user)
+            content = {'detail': 'successfully added rate for place'}
+            return Response(content, status=status.HTTP_201_CREATED)
 
-#     def post(self,request,pk=None):
-#         serializer = self.serializer_class(data=request.data)
-#         print(request.data)
-#         serializer.is_valid()
-#         place_info = get_object_or_404(review, id=pk)
-#         current_rate = serializer.validated_data.get("rate")
-#         print(current_rate)
-#         RateViewSerializer(place_info, many=False)
-#         user = CustomUser.objects.get(username=request.user.username)
-#         place = review.objects.get(id=pk)
-#         #rate = Rate.objects.get(user=user, place=place)
-#         #rate.rate += 1
-#         new_rate = current_rate+1
-#         rate = Rate(user=user, place=place, rate=1)
-#         rate.save()
-#         content = {'place': review.title, 'user': user.username,
-#                    'detail': 'successfully added rate for place'}
-#         return Response(content, status=status.HTTP_201_CREATED)
 
