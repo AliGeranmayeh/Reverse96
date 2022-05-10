@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
     picture = models.ImageField(null=True, blank=True, upload_to='media/profiles/', default='profiles/default.png')
     address = models.TextField()
     is_active = models.BooleanField(default=False)
-    liked=models.ManyToManyField('review.places', related_name='liked', blank=True )
+    liked=models.ManyToManyField('review.review', related_name='liked', blank=True )
     def __str__(self):
         return self.username
 

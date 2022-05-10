@@ -4,12 +4,12 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.fields import CurrentUserDefault
 
-from .models import locations, places, Comment
+from .models import locations, review, Comment
 
 
 class review_serializer(serializers.ModelSerializer):
     class Meta:
-        model = places
+        model = review
         fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location']
 
 

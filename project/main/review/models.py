@@ -10,11 +10,11 @@ class locations(models.Model):
     picture = models.ImageField(upload_to='media/profiles/', default='profiles/default.png')
     long=models.DecimalField(max_digits=9, decimal_places=6)
     latt=models.DecimalField(max_digits=9, decimal_places=6)
-    rating=models.DecimalField(max_digits=2,decimal_places=1, default=0.0)
+    no_of_likes=models.DecimalField(max_digits=2,decimal_places=1, default=0.0)
     def __str__(self):
         return str(self.id)
 
-class places(models.Model):
+class review(models.Model):
     title=models.CharField(max_length=300)
     id=models.BigAutoField(unique=True, primary_key=True)
     text = models.TextField()
@@ -27,7 +27,7 @@ class places(models.Model):
         return str(self.id)
 
 class Comment(models.Model):
-    place = models.ForeignKey(places, on_delete=models.CASCADE)
+    place = models.ForeignKey(review, on_delete=models.CASCADE)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     comment_text = models.TextField(default='user comment')
 
