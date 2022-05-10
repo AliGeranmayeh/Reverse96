@@ -11,6 +11,15 @@ class review_serializer(serializers.ModelSerializer):
         model = review
         fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by']
 
+class review_serializer1_nubmer_of_likes(serializers.ModelSerializer):
+    no_of_likes=serializers.SerializerMethodField('my_function')
+    def my_function(self,reviews):
+        return len(reviews.liked_by.filter())
+    class Meta:
+        model = review
+        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by','no_of_likes']
+
+
 
 class location_serializer(serializers.ModelSerializer):
     no_of_reviews=serializers.SerializerMethodField('no_of_reviews_function')
