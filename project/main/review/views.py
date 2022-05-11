@@ -24,7 +24,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
 #locatin in map fram with child reviews
 class get_map_location_view1(APIView):
-    def get(self,request):
+    def post(self,request):
         coordinates=request.data['coordinates']
         map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
             & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-no_of_likes')
@@ -32,7 +32,7 @@ class get_map_location_view1(APIView):
         return Response({'message': serializer.data},status=status.HTTP_200_OK)
 #location within map frame without child reviews
 class get_map_location_view(APIView):
-    def get(self,request):
+    def post(self,request):
         coordinates=request.data['coordinates']
         map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
             & Q(long__range=[coordinates[1],coordinates[3]]))
