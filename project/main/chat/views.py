@@ -7,9 +7,9 @@ from django.db.models import Q
 User = get_user_model()
 
 
-def get_last_10_messages(chatId, Mid):
+def get_last_10_messages(chatId):
     chat = get_object_or_404(Chat, id=chatId)
-    return chat.messages.order_by('-timestamp').all()#[:Mid]
+    return chat.messages.order_by('timestamp').all()#[:Mid]
 
 def get_unseen_messages(chatId, Mfrom):
     chat = get_object_or_404(Chat, id=chatId)
