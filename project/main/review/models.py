@@ -8,8 +8,8 @@ class locations(models.Model):
     id=models.BigAutoField(primary_key=True)
     name=models.CharField(max_length=300)
     picture = models.ImageField(upload_to='media/profiles/', default='profiles/default.png')
-    long=models.DecimalField(max_digits=23, decimal_places=20)
-    latt=models.DecimalField(max_digits=23, decimal_places=20)
+    long=models.DecimalField(max_digits=23, decimal_places=15)
+    latt=models.DecimalField(max_digits=23, decimal_places=15)
     no_of_likes=models.DecimalField(max_digits=2,decimal_places=1, default=0.0)
     def __str__(self):
         return str(self.id)
