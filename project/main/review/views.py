@@ -5,7 +5,7 @@ from logging import raiseExceptions
 from operator import truediv
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer
+from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
 from .models import review,locations, Comment
@@ -48,12 +48,12 @@ class get_reviews_api(APIView):
         if (pk=='1'):
             reviews=review.objects.all().order_by('-date_created')
             print(reviews)
-            serializer=review_serializer(reviews,many=True)
+            serializer=review_serializer_username_inlcluded(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         elif (pk=='2'):
             reviews=review.objects.annotate(max_weight=Max('liked_by')).order_by('-max_weight')[:10]
             print(reviews)
-            serializer=review_serializer(reviews,many=True)
+            serializer=review_serializer_username_inlcluded(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)

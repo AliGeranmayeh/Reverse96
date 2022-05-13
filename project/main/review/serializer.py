@@ -10,7 +10,14 @@ class review_serializer(serializers.ModelSerializer):
     class Meta:
         model = review
         fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by']
-        
+
+class review_serializer_username_inlcluded(serializers.ModelSerializer):
+    username=serializers.SerializerMethodField('username_function')
+    def username_function(self,reviews):
+        return reviews.user.username
+    class Meta:
+        model = review
+        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by','username']
 
 
 class location_serializer(serializers.ModelSerializer):
