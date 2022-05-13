@@ -1,7 +1,7 @@
 from functools import partial
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer, UserEditProfileSerializer, ChangePasswordSerializer
+from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer,UserEditProfileSerializer, ChangePasswordSerializer,UserDetailSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .models import CustomUser,EmailValidation
@@ -117,7 +117,7 @@ class get_user_detail(APIView):
         if (not user):
             return Response({'message':"user does not exist"} ,status=status.HTTP_404_NOT_FOUND)
         else:
-            serializer = PublicProfileSerializer(CustomUser.objects.get(username=user.username), many=False)
+            serializer = UserDetailSerializer(CustomUser.objects.get(username=user.username), many=False)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
 
