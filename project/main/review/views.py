@@ -143,7 +143,7 @@ class CommentViewAPI(APIView):
     serializer_class = CommentSerializer
     #permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, pk=None):
+    def post(self, request, pk=None):
         placees_info = review.objects.filter(id=pk)
         CommentSerializer(placees_info, many=False)
 
@@ -158,7 +158,7 @@ class SubmitCommentAPI(APIView):
     serializer_class = CommentCreationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, pk=None):
+    def post(self, request, pk=None):
         placees_info = review.objects.filter(id=pk)
         serializer = self.serializer_class(data=request.data)
         CommentSerializer(placees_info, many=False)
