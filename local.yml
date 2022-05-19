@@ -14,6 +14,7 @@ services:
     platform: linux/x86_64
     depends_on:
       - postgres
+      - redis
     volumes:
       - .:/app:z
     env_file:
@@ -34,4 +35,9 @@ services:
       - my_awesome_project_local_postgres_data_backups:/backups:z
     env_file:
       - ./.envs/.local/.postgres
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
 
