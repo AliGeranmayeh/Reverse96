@@ -1,17 +1,11 @@
-from ast import Delete
-from functools import partial
 from django.db.models import Max
 from logging import raiseExceptions
-from operator import truediv
-from django.shortcuts import render
 from rest_framework.views import APIView
 from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded
-from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
 from .models import review,locations, Comment
 from user.models import CustomUser
 from rest_framework import permissions, status
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.db.models import Q
 from django.core.mail import send_mail
 from rest_framework.generics import GenericAPIView
