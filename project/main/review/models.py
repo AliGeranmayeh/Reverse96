@@ -1,6 +1,4 @@
-from operator import mod
-from re import T
-from unicodedata import name
+
 from django.db import models
 from user.models import CustomUser
 # Create your models here.
