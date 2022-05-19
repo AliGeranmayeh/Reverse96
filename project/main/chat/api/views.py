@@ -1,3 +1,4 @@
+from urllib import request
 from django.contrib.auth import get_user_model
 from rest_framework import permissions
 from rest_framework.generics import (
@@ -7,7 +8,7 @@ from rest_framework.generics import (
     DestroyAPIView,
     UpdateAPIView
 )
-from chat.models import Chat, Contact
+from chat.models import Chat
 from chat.views import get_user_contact
 from .serializers import ChatSerializer
 
