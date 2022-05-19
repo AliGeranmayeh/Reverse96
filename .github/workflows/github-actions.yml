@@ -2,15 +2,22 @@ name: learn-github-actions
 on: push
 jobs:
   check-super-lint:
-    name: Lint code base
+    name: run tests
     runs-on: ubuntu-latest
     steps:
-      - name: checkout code
+      - name: Checkout code # checking our the code at current commit that triggers the workflow
         uses: actions/checkout@v2
-
-      - name: Run Super-Linter
-        uses: github/super-linter@v4.7.3
-
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup python environment # setting python environment to 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x' # if you want multiple python version run just use matrix strategy in job config. See the documentation of GitHub Actions
+      - name: Check Python version # checking the python version to see if 3.x is installed.
+        run: python --version
+      - name: Install requirements # install application requirements
+        run: pip install -r requirements.txt
+      - name: Check Syntax # check code formatting
+        run: pycodestyle --statistics .
+      - name: Run Migrations # run migrations to create table in side car db container
+        run: python manage.py migrate
+      - name: Run Test # running tests
+        run: python manage.py test
