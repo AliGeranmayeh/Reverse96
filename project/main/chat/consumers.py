@@ -1,4 +1,5 @@
 
+from asyncio.windows_events import NULL
 from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
@@ -52,6 +53,14 @@ class ChatConsumer(WebsocketConsumer):
             'message': self.message_to_json(message)
         }
         return self.send_chat_message(content)
+    
+    def send_command_to_front(self):
+        content = {
+            'command': 'fetch_message',
+            #'message': self.message_to_json(message)
+        }
+        return self.send_chat_message(content)
+
 
     def set_seen_messages(self,data):
         contact_user=get_user_contact(data['from'])
@@ -61,6 +70,7 @@ class ChatConsumer(WebsocketConsumer):
             msg.flag=True
             msg.save(update_fields=['flag'])
             print(msg)
+        self.send_command_to_front()
         
     def flag_message(self,data):
         message=get_reply_message(data['chatId'],data['id'])
@@ -71,10 +81,14 @@ class ChatConsumer(WebsocketConsumer):
         message=get_reply_message(data['chatId'],data['id'])
         message.content=data['message']
         message.save(update_fields=['content'])
+        self.send_command_to_front()
+
     
     def delete_message(self, data):
         message=get_reply_message(data['chatId'],data['id'])
         message.delete()
+        self.send_command_to_front()
+
 
 
     def messages_to_json(self, messages):
@@ -89,7 +103,8 @@ class ChatConsumer(WebsocketConsumer):
                 'id': message.id,
                 'author': message.contact.username,
                 'content': message.content,
-                'timestamp': str(message.timestamp)
+                'timestamp': str(message.timestamp),
+                'flag':message.flag
         }
         else:
             return {
@@ -97,6 +112,7 @@ class ChatConsumer(WebsocketConsumer):
                 'author': message.contact.user.username,
                 'content': message.content,
                 'timestamp': str(message.timestamp),
+                'flag':message.flag,
                 'reply':message.reply.content
         }
 
