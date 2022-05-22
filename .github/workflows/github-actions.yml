@@ -18,6 +18,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Make Migrations
+        run: |
+          cd ./project/main/
+          python manage.py makemigrations 
+          python manage.py migrate
       - name: Run Tests
         run: |
           cd ./project/main/
