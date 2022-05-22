@@ -10,6 +10,7 @@ urlpatterns = [
     path('email-activision',views.EmailActivisionView.as_view(), name="email-activision"),
     path('logout', views.LogoutView.as_view(), name="logout"),
     path('public-profile/<str:pk>', views.PublicProfileView.as_view(), name="public-profile"),
+    path('get-user-detail', views.get_user_detail.as_view(), name="get-user-detail"),
     path('Edit-userProfile', views.UserEditProfileView.as_view(), name="Edit-uesrProfile"),
     path('change_password', views.ChangePasswordView.as_view(), name="change_password"),
 ]

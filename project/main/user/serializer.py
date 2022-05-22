@@ -61,6 +61,11 @@ class PublicProfileSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['username', 'email',  'name', 'address',
                   'is_active', 'phone_number', 'picture']
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email',  'name', 'address',
+                  'is_active', 'phone_number', 'picture','id']
 
 class UserEditProfileSerializer(serializers.ModelSerializer):
     class Meta:
