@@ -22,6 +22,10 @@ jobs:
         run: python --version
       - name: Install requirements # install application requirements
         run: pip install -r requirements.txt
+     - name: Run Migrations # run migrations to create table in side car db container
+        run: |
+          cd ./project/main/
+          python manage.py migrate
       - name: Run Test # running tests
         run: |
           cd ./project/main/
