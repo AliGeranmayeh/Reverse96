@@ -23,4 +23,5 @@ jobs:
       - name: Install requirements # install application requirements
         run: pip install -r requirements.txt
       - name: Run Test # running tests
+        cd ./project/main/
         run: python manage.py test
