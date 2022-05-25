@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   libpq-dev
 
 # Requirements are installed here to ensure they will be cached.
-COPY ./requirements .
+COPY ./requirements.txt .
 
 # Create Python Dependency and Sub-Dependency Wheels.
 RUN pip wheel --wheel-dir /usr/src/app/wheels  \
@@ -29,7 +29,7 @@ RUN pip wheel --wheel-dir /usr/src/app/wheels  \
 FROM python as python-run-stage
 
 ARG BUILD_ENVIRONMENT=production
-ARG APP_HOME=/app
+ARG APP_HOME=/app/project/main
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
