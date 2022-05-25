@@ -98,11 +98,11 @@ ASGI_APPLICATION = "main.asgi.application"
 # }
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis://redis:6379/1", 6379)],
+            "hosts": [("redis", 6379)],
         },
-        "ROUTING": "django_channels.routing.channel_routing",
+
     },
 }
 
