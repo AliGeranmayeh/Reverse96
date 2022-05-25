@@ -19,6 +19,7 @@ urlpatterns = [
     path('add_user_comment/<str:pk>', views.SubmitCommentAPI.as_view(), name="add-comment"),
     path('rates/<str:pk>', views.ViewRateView.as_view(), name="all-rates"),
     path('add_user_like/<str:pk>', views.RateView.as_view(), name="add-rate"),
+    path('limited_area', views.Circle_Area_locations.as_view(), name="limited-area"),
 
 
 ]

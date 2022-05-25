@@ -73,7 +73,7 @@ def get_location_from_id(locationid):
 
 class Limited_Location_Serializer(serializers.ModelSerializer):
     no_of_reviews=serializers.SerializerMethodField('no_of_reviews_function')
-    radius = serializers.IntegerField(required=True, allow_null=False)
+    #radius = serializers.IntegerField(required=True, allow_null=False)
     long=serializers.DecimalField(max_digits=23, decimal_places=15,required=True, allow_null=False)
     latt=serializers.DecimalField(max_digits=23, decimal_places=15,required=True, allow_null=False)
     def no_of_reviews_function(self,locations):

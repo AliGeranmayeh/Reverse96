@@ -1,7 +1,7 @@
 from django.db.models import Max
 from logging import raiseExceptions
 from rest_framework.views import APIView
-from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded
+from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded,Limited_Location_Serializer
 from rest_framework.response import Response
 from .models import review,locations, Comment
 from user.models import CustomUser
@@ -204,3 +204,17 @@ class RateView(APIView):
             return Response(content, status=status.HTTP_201_CREATED)
 
 
+class Circle_Area_locations(APIView):
+    serializer_class = Limited_Location_Serializer
+       
+
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+
+        #radius =serializer.validated_data.get("radius")
+        latt =request.data['latt']
+        long =request.data['long']
+        location = locations.objects.all().order_by('-id')
+        # map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
+        #     & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-no_of_likes')
+        return Response(serializer.data)
