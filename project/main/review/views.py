@@ -204,17 +204,18 @@ class RateView(APIView):
             return Response(content, status=status.HTTP_201_CREATED)
 
 
-class Circle_Area_locations(APIView):
-    serializer_class = Limited_Location_Serializer
-       
-
+class Category(APIView):
     def post(self,request):
-        serializer = self.serializer_class(data=request.data)
+        coordinates=request.data['coordinates']
+        serializer= Limited_Location_Serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        category= serializer.validated_data.get('place_category')
 
-        #radius =serializer.validated_data.get("radius")
-        latt =request.data['latt']
-        long =request.data['long']
-        location = locations.objects.all().order_by('-id')
-        # map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
-        #     & Q(long__range=[coordinates[1],coordinates[3]])).order_by('-no_of_likes')
-        return Response(serializer.data)
+        if category:
+            map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
+                & Q(long__range=[coordinates[1],coordinates[3]]) & Q(place_category= category))
+        else:
+             map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
+                & Q(long__range=[coordinates[1],coordinates[3]]))
+        s= Limited_Location_Serializer(map_locations,many=True)
+        return Response({'message': s.data},status=status.HTTP_200_OK)
