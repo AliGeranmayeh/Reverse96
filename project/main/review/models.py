@@ -29,7 +29,7 @@ class locations(models.Model):
     picture = models.ImageField(upload_to='media/profiles/', default='profiles/default.png')
     long=models.DecimalField(max_digits=23, decimal_places=15)
     latt=models.DecimalField(max_digits=23, decimal_places=15)
-    place_category = models.CharField(max_length=200, choices=place_categories, default=place_categories[0])
+    place_category = models.CharField(max_length=200, choices=place_categories, default=place_categories[0][0])
     no_of_likes=models.DecimalField(max_digits=2,decimal_places=1, default=0.0)
     def __str__(self):
         return str(self.id)
