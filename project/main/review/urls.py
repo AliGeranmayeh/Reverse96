@@ -5,6 +5,7 @@ from rest_framework_simplejwt import views as jwt_views
 
 urlpatterns = [
     path('review', views.user_review.as_view(), name="user_review"),
+    path('edit_review/<str:pk>', views.edit_user_reviews.as_view(), name="edit_user_review"),
     path('get_user_reviews', views.get_user_reviews.as_view(), name="get_user_reviews"),
     path('get_reviews/<str:pk>', views.get_reviews_api.as_view(), name="get_reviews"),
     path('delete_user_reviews/<str:pk>', views.delete_user_reviews.as_view(), name="delete_user_reviews"),

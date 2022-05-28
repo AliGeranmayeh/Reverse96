@@ -1,3 +1,4 @@
+from functools import partial
 from django.db.models import Max
 from logging import raiseExceptions
 from rest_framework.views import APIView
@@ -40,12 +41,12 @@ def get_location_from_id(locationid):
 class get_reviews_api(APIView):
     def get(self,request,pk=None):
         if (pk=='1'):
-            reviews=review.objects.all().order_by('-date_created')
+            reviews=review.objects.filter(is_public=True).order_by('-date_created')
             print(reviews)
             serializer=review_serializer_username_inlcluded(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         elif (pk=='2'):
-            reviews=review.objects.annotate(max_weight=Max('liked_by')).order_by('-max_weight')[:10]
+            reviews=review.objects.filter(is_public=True).annotate(max_weight=Max('liked_by')).order_by('-max_weight')[:10]
             print(reviews)
             serializer=review_serializer_username_inlcluded(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
@@ -57,20 +58,10 @@ class user_review(APIView):
     parser_classes = [MultiPartParser, FormParser]
     def post(self,request):
         data=request.data
-        data["user"]=request.user.id
-        # if("picture" in data):
-        #     serializer_data={
-        #         "address": data["address"],
-        #         "name":data["name"],
-        #         "user":request.user,
-        #         "picture":data["picture"]
-        #     }
-        # else:
-        #     serializer_data={
-        #         "address": data["address"],
-        #         "name":data["name"],
-        #         "user":request.user
-        #     }
+        _mutable = data._mutable
+        data._mutable = True        # set to mutable
+        data['user'] = request.user.id        # сhange the values you want
+        data._mutable = _mutable        # set mutable flag back
         serializer = review_serializer(data=request.data,partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -89,7 +80,14 @@ class delete_user_reviews(APIView):
         task = review.objects.get(id=pk)
         task.delete()
         return Response({"message": "item seuccesfuly deleted!"}, status=status.HTTP_200_OK)
-    
+class edit_user_reviews(APIView):
+    permissions=[permissions.IsAuthenticated]   
+    def post(self,request,pk=None):
+        user_review=review.objects.get(id=pk)
+        serializer=review_serializer(user_review,request.data,partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": serializer.data}, status=status.HTTP_205_RESET_CONTENT)
 
 class add_location_api(APIView):
     permissions = [permissions.IsAuthenticated]

@@ -8,7 +8,7 @@ from .models import locations, review, Comment
 class review_serializer(serializers.ModelSerializer):
     class Meta:
         model = review
-        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by']
+        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by','is_public']
 
 class review_serializer_username_inlcluded(serializers.ModelSerializer):
     username=serializers.SerializerMethodField('username_function')
