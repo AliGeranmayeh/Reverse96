@@ -1,5 +1,9 @@
+from asyncio.windows_events import NULL
+from functools import partial
+from http.client import PROXY_AUTHENTICATION_REQUIRED
 from rest_framework import serializers
-from .models import CustomUser, EmailValidation
+
+from .models import CustomUser, EmailValidation, FollowRequest, UserFollowing
 from django.utils.text import gettext_lazy
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.contrib.auth.password_validation import validate_password
@@ -11,13 +15,13 @@ class LoginSerializer(serializers.ModelSerializer):
                                      required=True, allow_blank=False, allow_null=False)
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'password', 'name', 'phone_number', 'address', 'is_active', 'picture']
+        fields = ['id', 'username', 'email', 'password', 'name', 'phone_number', 'address', 'is_active', 'picture','is_public']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'password', 'name', 'phone_number', 'address', 'is_active', 'picture']
+        fields = ['id', 'username', 'email', 'password', 'name', 'phone_number', 'address', 'is_active', 'picture','is_public']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -54,24 +58,68 @@ class RefreshTokenSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             self.fail('bad_token')
+class PictureSerializer(serializers.Serializer):
+    picture=serializers.ImageField(max_length=None, use_url=True, allow_null=False, required=True)
+
+class UserFollowingSerializer(serializers.ModelSerializer):
+    picture=serializers.SerializerMethodField('picture_func')
+    username=serializers.SerializerMethodField('username_func')
+    def picture_func(self,instance):
+        img={}
+        img['picture']=instance.user_id.picture
+        serializer=PictureSerializer(img)
+        return serializer.data['picture']
+    def username_func(self,instance):
+        return instance.user_id.username
+    class Meta:
+         model=UserFollowing
+         fields=('user_id','following_user_id','username','picture')
 
 
 class PublicProfileSerializer(serializers.ModelSerializer):
+    followers=serializers.SerializerMethodField('adding_followers')
+    followings=serializers.SerializerMethodField('adding_followings')
+    mutuals=serializers.SerializerMethodField('adding_mutuals')
+    def adding_followers(self,instance):
+        serializer=UserFollowingSerializer(data=instance.followers.all(),many=True)
+        serializer.is_valid()
+        return serializer.data
+    def adding_followings(self,instance):
+        serializer=UserFollowingSerializer(data=instance.followings.all(),many=True)
+        serializer.is_valid()
+        return serializer.data
+    def adding_mutuals(self,instance):
+        follower_list=list(instance.followings.all())
+        following_list=list(instance.followers.all())
+        mutual_list=[]
+        for i in follower_list:
+            for j in following_list:
+                if i.user_id==j.following_user_id:
+                    if j not in mutual_list:
+                        mutual_list.append(j)
+        serializer=UserFollowingSerializer(data=mutual_list,many=True)
+        serializer.is_valid()
+        return serializer.data
+
+
     class Meta:
         model = CustomUser
         fields = ['username', 'email',  'name', 'address',
-                  'is_active', 'phone_number', 'picture']
+                  'is_active', 'phone_number', 'picture','is_public','follow_state','followings',
+                  'bio','description','liked','followers','mutuals']
+        
 class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'email',  'name', 'address',
-                  'is_active', 'phone_number', 'picture','id']
+                  'is_active', 'phone_number', 'picture','id','is_public']
 
 class UserEditProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'name', 'phone_number', 'address',
-                  'is_private_person', 'is_book_store', 'profile_image']
+        fields = ['username', 'email',  'name', 'address',
+                  'is_active', 'phone_number', 'picture','is_public',
+                  'bio','description']
 
         def validate_username(self, value):
             if CustomUser.objects.filter(username=value).exists():
@@ -105,3 +153,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         instance.set_password(validated_data['password'])
         instance.save()
         return instance
+class FollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=FollowRequest
+        fields=['to_user','from_user','timestamp','is_active']
