@@ -70,7 +70,7 @@ class UserFollowingSerializer(serializers.ModelSerializer):
         serializer=PictureSerializer(img)
         return serializer.data['picture']
     def username_func(self,instance):
-        return instance.user_id.username
+        return instance.foloowing_user_id.username
     class Meta:
          model=UserFollowing
          fields=('user_id','following_user_id','username','picture')
