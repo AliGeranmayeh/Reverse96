@@ -74,8 +74,11 @@ def get_location_from_id(locationid):
 class Category_Serializer(serializers.ModelSerializer):
     no_of_reviews=serializers.SerializerMethodField('no_of_reviews_function')
     place_category = serializers.CharField(required=False)
+    name = serializers.CharField(required=False)
+    long = serializers.DecimalField(max_digits=23, decimal_places=15, required=False)
+    latt = serializers.DecimalField(max_digits=23, decimal_places=15, required=False)
     def no_of_reviews_function(self,locations):
         return len(locations.review_set.all())
     class Meta:
         model = locations
-        fields = ('id','no_of_reviews','place_category',)
+        fields = ('id', 'name', 'picture', 'long', 'latt', 'no_of_likes', 'no_of_reviews', 'place_category',)
