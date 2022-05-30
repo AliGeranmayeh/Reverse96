@@ -5,4 +5,9 @@ omit=
     */tests/*
     */staticfiles/*
     */migrations/*
-    */__init__.py  	
+    */__init__.py  
+    */admin.py  
+    */urls.py  
+    */tests.py
+    */apps.py  	
+    
