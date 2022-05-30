@@ -131,7 +131,7 @@ class get_user_detail(APIView):
         if (not user):
             return Response({'message':"user does not exist"} ,status=status.HTTP_404_NOT_FOUND)
         else:
-            serializer = UserDetailSerializer(CustomUser.objects.get(username=user.username), many=False)
+            serializer = PublicProfileSerializer(CustomUser.objects.get(username=user.username), many=False)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
 
