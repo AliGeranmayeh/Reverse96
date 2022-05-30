@@ -39,19 +39,32 @@ def get_location_from_id(locationid):
     return location
 #for home page and trends side bar
 class get_reviews_api(APIView):
+    permissions = [permissions.IsAuthenticated]
     def get(self,request,pk=None):
         if (pk=='1'):
-            reviews=review.objects.filter(is_public=True).order_by('-date_created')
-            print(reviews)
+            reviews=reviews_to_show(request.user)
             serializer=review_serializer_username_inlcluded(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         elif (pk=='2'):
             reviews=review.objects.filter(is_public=True).annotate(max_weight=Max('liked_by')).order_by('-max_weight')[:10]
-            print(reviews)
             serializer=review_serializer_username_inlcluded(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+def reviews_to_show(user,pk=None):
+    if pk:
+        reviews=review.objects.filter(location=pk).annotate(max_weight=Max('liked_by')).order_by('-max_weight')
+    else:
+        reviews=review.objects.all().order_by('-date_created')
+    reviews_to_show=[]
+    for i in list(reviews):
+        if not i.is_public:
+            for j in list(user.followings.all()):
+                if i.user==j.following_user_id or i.user==user:
+                    reviews_to_show.append(i)
+        else:
+            reviews_to_show.append(i)
+    return reviews_to_show
 #adding reviews of a location
 class user_review(APIView):
     permissions = [permissions.IsAuthenticated]
@@ -71,7 +84,7 @@ class get_user_reviews(APIView):
     permissions = [permissions.IsAuthenticated]
     def get(self,requst,slug=None):
         user_revs=CustomUser.objects.get(username=slug)
-        reviews=review.objects.filter(user=user_revs)
+        reviews=review.objects.filter(user=user_revs).order_by('-date_created')
         serializer=review_serializer(reviews,many=True)
         return Response({"message": serializer.data}, status=status.HTTP_200_OK)
 
@@ -112,8 +125,9 @@ class get_location_api(APIView):
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
 # getting child reviews of a single location with its id           
 class get_location_reviews(APIView):
+    permissions = [permissions.IsAuthenticated]
     def get(self,request,pk=None):
-        reviews=review.objects.filter(location=pk)
+        reviews=reviews_to_show(user=request.user,pk=pk)
         serializer=review_serializer(reviews, many=True)
         print(serializer.data)
         if not reviews:
