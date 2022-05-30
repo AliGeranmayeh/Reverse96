@@ -152,7 +152,8 @@ class send_follow_request(APIView):
             user = request.user
             T_user=CustomUser.objects.get(username=request.data['to_user'])
             F_requests=FollowRequest.objects.filter(Q(from_user=user.id) & Q(to_user=T_user.id))
-            if user.followings.filter(id=T_user.id).exists():
+            print(user.followings.all())
+            if user.followings.all().filter(following_user_id=T_user.id):
                 return Response({"message": "alredy followed"}, status=status.HTTP_302_FOUND)
             if F_requests:
                 F_requests.delete()

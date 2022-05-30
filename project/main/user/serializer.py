@@ -1,8 +1,4 @@
-from asyncio.windows_events import NULL
-from functools import partial
-from http.client import PROXY_AUTHENTICATION_REQUIRED
 from rest_framework import serializers
-
 from .models import CustomUser, EmailValidation, FollowRequest, UserFollowing
 from django.utils.text import gettext_lazy
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
