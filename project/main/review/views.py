@@ -1,7 +1,8 @@
+from functools import partial
 from django.db.models import Max
 from logging import raiseExceptions
 from rest_framework.views import APIView
-from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded
+from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded,Category_Serializer
 from rest_framework.response import Response
 from .models import review,locations, Comment
 from user.models import CustomUser
@@ -38,39 +39,44 @@ def get_location_from_id(locationid):
     return location
 #for home page and trends side bar
 class get_reviews_api(APIView):
+    permissions = [permissions.IsAuthenticated]
     def get(self,request,pk=None):
         if (pk=='1'):
-            reviews=review.objects.all().order_by('-date_created')
-            print(reviews)
+            reviews=reviews_to_show(request.user)
             serializer=review_serializer_username_inlcluded(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         elif (pk=='2'):
-            reviews=review.objects.annotate(max_weight=Max('liked_by')).order_by('-max_weight')[:10]
-            print(reviews)
+            reviews=review.objects.filter(is_public=True).annotate(max_weight=Max('liked_by')).order_by('-max_weight')[:10]
             serializer=review_serializer_username_inlcluded(reviews,many=True)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+def reviews_to_show(user,pk=None):
+    if pk:
+        reviews=review.objects.filter(location=pk).annotate(max_weight=Max('liked_by')).order_by('-max_weight')
+    else:
+        reviews=review.objects.all().order_by('-date_created')
+    reviews_to_show=[]
+    for i in list(reviews):
+        if not i.is_public:
+            for j in list(user.followings.all()):
+                if i.user==j.following_user_id or i.user==user:
+                    reviews_to_show.append(i)
+        else:
+            reviews_to_show.append(i)
+    return reviews_to_show
 #adding reviews of a location
 class user_review(APIView):
     permissions = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     def post(self,request):
         data=request.data
-        data["user"]=request.user.id
-        # if("picture" in data):
-        #     serializer_data={
-        #         "address": data["address"],
-        #         "name":data["name"],
-        #         "user":request.user,
-        #         "picture":data["picture"]
-        #     }
-        # else:
-        #     serializer_data={
-        #         "address": data["address"],
-        #         "name":data["name"],
-        #         "user":request.user
-        #     }
+        _mutable = data._mutable
+        data._mutable = True        # set to mutable
+        data['user'] = request.user.id        # сhange the values you want
+        if not request.user.is_public:
+            data['is_public']=False
+        data._mutable = _mutable        # set mutable flag back
         serializer = review_serializer(data=request.data,partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -78,8 +84,9 @@ class user_review(APIView):
 
 class get_user_reviews(APIView):
     permissions = [permissions.IsAuthenticated]
-    def get(self,requst):
-        reviews=review.objects.filter(user=requst.user.id)
+    def get(self,requst,slug=None):
+        user_revs=CustomUser.objects.get(username=slug)
+        reviews=review.objects.filter(user=user_revs).order_by('-date_created')
         serializer=review_serializer(reviews,many=True)
         return Response({"message": serializer.data}, status=status.HTTP_200_OK)
 
@@ -89,7 +96,14 @@ class delete_user_reviews(APIView):
         task = review.objects.get(id=pk)
         task.delete()
         return Response({"message": "item seuccesfuly deleted!"}, status=status.HTTP_200_OK)
-    
+class edit_user_reviews(APIView):
+    permissions=[permissions.IsAuthenticated]   
+    def post(self,request,pk=None):
+        user_review=review.objects.get(id=pk)
+        serializer=review_serializer(user_review,request.data,partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": serializer.data}, status=status.HTTP_205_RESET_CONTENT)
 
 class add_location_api(APIView):
     permissions = [permissions.IsAuthenticated]
@@ -113,8 +127,9 @@ class get_location_api(APIView):
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
 # getting child reviews of a single location with its id           
 class get_location_reviews(APIView):
+    permissions = [permissions.IsAuthenticated]
     def get(self,request,pk=None):
-        reviews=review.objects.filter(location=pk)
+        reviews=reviews_to_show(user=request.user,pk=pk)
         serializer=review_serializer(reviews, many=True)
         print(serializer.data)
         if not reviews:
@@ -204,3 +219,18 @@ class RateView(APIView):
             return Response(content, status=status.HTTP_201_CREATED)
 
 
+class Category(APIView):
+    def post(self,request):
+        coordinates=request.data['coordinates']
+        serializer = Category_Serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)        
+        category= serializer.validated_data.get('place_category')
+
+        if category:
+            map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
+                & Q(long__range=[coordinates[1],coordinates[3]]) & Q(place_category= category))
+        else:
+             map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
+                & Q(long__range=[coordinates[1],coordinates[3]]))
+        s = Category_Serializer(map_locations,many=True)
+        return Response({'message': s.data},status=status.HTTP_200_OK)

@@ -29,6 +29,8 @@ class Message(models.Model):
 
 class Chat(models.Model):
     name=models.CharField(max_length=300, null=True, blank=True)
+    description=models.TextField(null=True,blank=True)
+    picture = models.ImageField(upload_to='media/profiles/', default='profiles/default.png')
     participants = models.ManyToManyField(
         CustomUser, related_name='chats', blank=True)
     messages = models.ManyToManyField(Message, blank=True)

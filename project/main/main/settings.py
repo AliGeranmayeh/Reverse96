@@ -98,11 +98,11 @@ ASGI_APPLICATION = "main.asgi.application"
 # }
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis://redis:6379/1", 6379)],
+            "hosts": [("redis", 6379)],
         },
-        "ROUTING": "django_channels.routing.channel_routing",
+
     },
 }
 
@@ -114,10 +114,11 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-#DATABASES = {"default": env.db("DATABASE_URL")}
-#DATABASES["default"]["ATOMIC_REQUESTS"] = True
-# https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
-#DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+# DATABASES = {"default": env.db("DATABASE_URL")}
+# DATABASES["default"]["ATOMIC_REQUESTS"] = True
+# # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
+# DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 
 
 # Password validation

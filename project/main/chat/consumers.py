@@ -1,11 +1,7 @@
-
 from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
-from django.db.models.lookups import IsNull
-
-from rest_framework.fields import NullBooleanField
 from .models import Message, Chat
 from .views import get_last_10_messages, get_reply_message, get_user_contact, get_current_chat,get_unseen_messages
 
@@ -52,6 +48,14 @@ class ChatConsumer(WebsocketConsumer):
             'message': self.message_to_json(message)
         }
         return self.send_chat_message(content)
+    
+    def send_command_to_front(self):
+        content = {
+            'command': 'fetch_message',
+            #'message': self.message_to_json(message)
+        }
+        return self.send_chat_message(content)
+
 
     def set_seen_messages(self,data):
         contact_user=get_user_contact(data['from'])
@@ -61,6 +65,7 @@ class ChatConsumer(WebsocketConsumer):
             msg.flag=True
             msg.save(update_fields=['flag'])
             print(msg)
+        self.send_command_to_front()
         
     def flag_message(self,data):
         message=get_reply_message(data['chatId'],data['id'])
@@ -71,10 +76,14 @@ class ChatConsumer(WebsocketConsumer):
         message=get_reply_message(data['chatId'],data['id'])
         message.content=data['message']
         message.save(update_fields=['content'])
+        self.send_command_to_front()
+
     
     def delete_message(self, data):
         message=get_reply_message(data['chatId'],data['id'])
         message.delete()
+        self.send_command_to_front()
+
 
 
     def messages_to_json(self, messages):
@@ -89,15 +98,19 @@ class ChatConsumer(WebsocketConsumer):
                 'id': message.id,
                 'author': message.contact.username,
                 'content': message.content,
-                'timestamp': str(message.timestamp)
+                'timestamp': str(message.timestamp),
+                'flag':message.flag
         }
         else:
             return {
                 'id': message.id,
-                'author': message.contact.user.username,
+                'author': message.contact.username,
                 'content': message.content,
                 'timestamp': str(message.timestamp),
-                'reply':message.reply.content
+                'flag':message.flag,
+                'reply':message.reply.content,
+                'reply_id':message.reply.id,
+                'reply_user':message.reply.contact
         }
 
     commands = {

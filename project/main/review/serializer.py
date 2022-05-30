@@ -8,7 +8,7 @@ from .models import locations, review, Comment
 class review_serializer(serializers.ModelSerializer):
     class Meta:
         model = review
-        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by']
+        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by','is_public']
 
 class review_serializer_username_inlcluded(serializers.ModelSerializer):
     username=serializers.SerializerMethodField('username_function')
@@ -25,7 +25,7 @@ class location_serializer(serializers.ModelSerializer):
         return len(locations.review_set.all())
     class Meta:
         model = locations
-        fields = ('id','name','picture','long','latt','no_of_likes','no_of_reviews')
+        fields = ('id','name','picture','long','latt','no_of_likes','no_of_reviews','place_category',)
     
 class nameSerializer(serializers.StringRelatedField):
     def to_internal_value(self, value):
@@ -69,3 +69,16 @@ class CommentCreationSerializer(serializers.Serializer):
 def get_location_from_id(locationid):
     location=locations.objects.get(id=locationid)
     return location
+
+
+class Category_Serializer(serializers.ModelSerializer):
+    no_of_reviews=serializers.SerializerMethodField('no_of_reviews_function')
+    place_category = serializers.CharField(required=False)
+    name = serializers.CharField(required=False)
+    long = serializers.DecimalField(max_digits=23, decimal_places=15, required=False)
+    latt = serializers.DecimalField(max_digits=23, decimal_places=15, required=False)
+    def no_of_reviews_function(self,locations):
+        return len(locations.review_set.all())
+    class Meta:
+        model = locations
+        fields = ('id', 'name', 'picture', 'long', 'latt', 'no_of_likes', 'no_of_reviews', 'place_category',)
