@@ -104,7 +104,7 @@ class ChatConsumer(WebsocketConsumer):
         else:
             return {
                 'id': message.id,
-                'author': message.contact.user.username,
+                'author': message.contact.username,
                 'content': message.content,
                 'timestamp': str(message.timestamp),
                 'flag':message.flag,
