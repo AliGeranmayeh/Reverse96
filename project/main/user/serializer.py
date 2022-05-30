@@ -114,7 +114,7 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email',  'name', 'address',
+        fields = ['username', 'email',  'name', 'address','id',
                   'is_active', 'phone_number', 'picture','is_public','follow_state','followings',
                   'bio','description','liked','followers','mutuals']
         
