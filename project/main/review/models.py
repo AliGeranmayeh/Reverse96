@@ -43,8 +43,10 @@ class review(models.Model):
     location=models.ForeignKey(locations,on_delete=models.CASCADE)
     date_created=models.DateTimeField(auto_now_add=True)
     liked_by=models.ManyToManyField(CustomUser,related_name="liked_by")
+    is_public=models.BooleanField(default=True)
     def __str__(self):
         return str(self.id)
+
 
 class Comment(models.Model):
     place = models.ForeignKey(review, on_delete=models.CASCADE)

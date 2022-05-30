@@ -1,10 +1,12 @@
+from dataclasses import is_dataclass
 from functools import partial
+from typing import Tuple
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer,UserEditProfileSerializer, ChangePasswordSerializer,UserDetailSerializer
+from .serializer import LoginSerializer, RegisterSerializer, EmailActivisionSerializer, RefreshTokenSerializer, PublicProfileSerializer,UserEditProfileSerializer, ChangePasswordSerializer,UserDetailSerializer,FollowSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .models import CustomUser,EmailValidation
+from .models import CustomUser,EmailValidation, FollowRequest, UserFollowing
 from rest_framework import permissions, status, generics
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.db.models import Q
@@ -100,13 +102,25 @@ class LogoutView(GenericAPIView):
         return Response({"message": "logout process was successfull"},status=status.HTTP_204_NO_CONTENT)
 
 class PublicProfileView(APIView):
-    def get(self, request, pk=None):
-        public_user_info = CustomUser.objects.filter(username=pk)
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, slug):
+        public_user_info = CustomUser.objects.get(username=slug)
         serializer = PublicProfileSerializer(public_user_info, many=False)
         if(not public_user_info):
             return Response({'message':"user does not exist"} ,status=status.HTTP_404_NOT_FOUND)
         else:
-            existed_public_user_info = CustomUser.objects.get(username=pk)
+            existed_public_user_info = CustomUser.objects.get(username=slug)
+            following_state=FollowRequest.objects.distinct().filter(Q(to_user=public_user_info.id)&Q(from_user=request.user))
+            if existed_public_user_info.followers.all().filter(user_id=request.user.id).exists():
+                existed_public_user_info.follow_state="following"
+            else:
+                if following_state:
+                    if following_state.is_active:
+                        existed_public_user_info.follow_state="pending"
+                    else:
+                        existed_public_user_info.follow_state="declined"
+                else:
+                    existed_public_user_info.follow_state="follow"
             serializer = PublicProfileSerializer(existed_public_user_info, many=False)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
@@ -117,7 +131,7 @@ class get_user_detail(APIView):
         if (not user):
             return Response({'message':"user does not exist"} ,status=status.HTTP_404_NOT_FOUND)
         else:
-            serializer = UserDetailSerializer(CustomUser.objects.get(username=user.username), many=False)
+            serializer = PublicProfileSerializer(CustomUser.objects.get(username=user.username), many=False)
             return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
 
@@ -131,6 +145,75 @@ class UserEditProfileView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": serializer.data}, status=status.HTTP_205_RESET_CONTENT)
+
+class send_follow_request(APIView):
+        permissions = [permissions.IsAuthenticated]
+        def post(self, request):
+            user = request.user
+            T_user=CustomUser.objects.get(username=request.data['to_user'])
+            if FollowRequest.objects.filter(Q(from_user=user.id) & Q(to_user=T_user.id)).exists():
+                F_requests=FollowRequest.objects.get(Q(from_user=user.id) & Q(to_user=T_user.id))
+            print(user.followings.all())
+            if user.followings.all().filter(following_user_id=T_user.id):
+                return Response({"message": "alredy followed"}, status=status.HTTP_302_FOUND)
+            if F_requests:
+                if F_requests.is_active:
+                    F_requests.delete()
+                    return Response({"message": "friend request canceled"}, status=status.HTTP_410_GONE)
+                else:
+                    return Response({"message": "friend request is declined"}, status=status.HTTP_410_GONE)
+            else:
+                if T_user.is_public:
+                    UserFollowing.objects.create(user_id=T_user,
+                             following_user_id=user)
+                    return Response({"message": "you have followed user"}, status=status.HTTP_201_CREATED)
+                else:
+                    serializer = FollowSerializer(data={'from_user':user.id,'to_user':T_user.id},partial=True)
+                    serializer.is_valid(raise_exception=True)
+                    serializer.save()
+                    return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
+
+class accept_follow_request(APIView):
+        permissions = [permissions.IsAuthenticated]
+        def post(self, request):
+            user = request.user
+            F_user=CustomUser.objects.get(username=request.data['from_user'])
+            if FollowRequest.objects.filter(Q(from_user=F_user) & Q(to_user=user)).exists():
+                F_requests=FollowRequest.objects.get(Q(from_user=F_user) & Q(to_user=user))
+            else:
+                return Response({"message": "no new follow request"}, status=status.HTTP_204_NO_CONTENT)
+            if F_requests.is_active==True:
+                if request.data['accept']:
+                    UserFollowing.objects.create(user_id=user,
+                             following_user_id=F_user)
+                    F_requests.delete()
+                    return Response({"message": "follow request accepted"}, status=status.HTTP_202_ACCEPTED)
+                else:
+                    F_requests.is_active=False
+                    F_requests.save()
+                    return Response({"message": "follow request declined"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": " follow request is already declined"}, status=status.HTTP_204_NO_CONTENT)
+
+class UnFollowUser(APIView):
+        permissions = [permissions.IsAuthenticated]
+        def post(self, request):
+            user = request.user
+            T_user=CustomUser.objects.get(username=request.data['user'])
+            instance=UserFollowing.objects.filter(Q(user_id=user.id)&
+                            Q( following_user_id=T_user.id))
+            instance.delete()
+            return Response({"message": "succesfully unfollowed"}, status=status.HTTP_205_RESET_CONTENT)
+            
+class RemoveFollower(APIView):
+        permissions = [permissions.IsAuthenticated]
+        def post(self, request):
+            user = request.user
+            T_user=CustomUser.objects.get(username=request.data['user'])
+            instance=UserFollowing.objects.filter(Q(user_id=T_user.id)&
+                            Q( following_user_id=user.id))
+            instance.delete()
+            return Response({"message": "succesfully removed follower"}, status=status.HTTP_205_RESET_CONTENT)
 
 
 class ChangePasswordView(generics.UpdateAPIView):
