@@ -6,9 +6,16 @@ from .models import locations, review, Comment
 
 
 class review_serializer(serializers.ModelSerializer):
+    location_name=serializers.SerializerMethodField('get_name')
+    location_picture=serializers.SerializerMethodField('get_picture')
+    def get_name(self,instance):
+        return instance.location.name
+    def get_picture(self,instance):
+        return instance.location.picture
     class Meta:
         model = review
-        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by','is_public']
+        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by','is_public',
+        'location_picture','location_name']
 
 class review_serializer_username_inlcluded(serializers.ModelSerializer):
     username=serializers.SerializerMethodField('username_function')
