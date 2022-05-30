@@ -61,6 +61,20 @@ class RefreshTokenSerializer(serializers.Serializer):
 class PictureSerializer(serializers.Serializer):
     picture=serializers.ImageField(max_length=None, use_url=True, allow_null=False, required=True)
 
+class UserFollowerSerializer(serializers.ModelSerializer):
+    picture=serializers.SerializerMethodField('picture_func')
+    username=serializers.SerializerMethodField('username_func')
+    def picture_func(self,instance):
+        img={}
+        img['picture']=instance.user_id.picture
+        serializer=PictureSerializer(img)
+        return serializer.data['picture']
+    def username_func(self,instance):
+        return instance.user_id.username
+    class Meta:
+         model=UserFollowing
+         fields=('username','picture')
+
 class UserFollowingSerializer(serializers.ModelSerializer):
     picture=serializers.SerializerMethodField('picture_func')
     username=serializers.SerializerMethodField('username_func')
@@ -70,10 +84,10 @@ class UserFollowingSerializer(serializers.ModelSerializer):
         serializer=PictureSerializer(img)
         return serializer.data['picture']
     def username_func(self,instance):
-        return instance.foloowing_user_id.username
+        return instance.following_user_id.username
     class Meta:
          model=UserFollowing
-         fields=('user_id','following_user_id','username','picture')
+         fields=('username','picture')
 
 
 class PublicProfileSerializer(serializers.ModelSerializer):
@@ -81,7 +95,7 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     followings=serializers.SerializerMethodField('adding_followings')
     mutuals=serializers.SerializerMethodField('adding_mutuals')
     def adding_followers(self,instance):
-        serializer=UserFollowingSerializer(data=instance.followers.all(),many=True)
+        serializer=UserFollowerSerializer(data=instance.followers.all(),many=True)
         serializer.is_valid()
         return serializer.data
     def adding_followings(self,instance):
