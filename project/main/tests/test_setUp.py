@@ -17,7 +17,7 @@ class Test_SetUp(APITestCase):
             "password": "12345",
             "address": self.fake.address(),
             "name": self.fake.name(),
-            "phone_number": randint(1000000000, 9999999999),
+            "phone_number": f'{randint(1000000000, 9999999999)}',
             "is_active":True
         }
 
