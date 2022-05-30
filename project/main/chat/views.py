@@ -13,7 +13,7 @@ def get_last_10_messages(chatId):
 
 def get_unseen_messages(chatId, Mfrom):
     chat = get_object_or_404(Chat, id=chatId)
-    return chat.messages.filter(Q(flag=False) & Q(contact=Mfrom)).order_by('-timestamp')
+    return chat.messages.filter(Q(flag=False) & ~Q(contact=Mfrom)).order_by('-timestamp')
 
 
 def get_user_contact(username):
