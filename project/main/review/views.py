@@ -69,8 +69,9 @@ class user_review(APIView):
 
 class get_user_reviews(APIView):
     permissions = [permissions.IsAuthenticated]
-    def get(self,requst):
-        reviews=review.objects.filter(user=requst.user.id)
+    def get(self,requst,slug=None):
+        user_revs=CustomUser.objects.get(username=slug)
+        reviews=review.objects.filter(user=user_revs)
         serializer=review_serializer(reviews,many=True)
         return Response({"message": serializer.data}, status=status.HTTP_200_OK)
 
