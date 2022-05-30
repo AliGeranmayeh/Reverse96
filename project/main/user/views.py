@@ -151,18 +151,27 @@ class send_follow_request(APIView):
         def post(self, request):
             user = request.user
             T_user=CustomUser.objects.get(username=request.data['to_user'])
-            F_requests=FollowRequest.objects.filter(Q(from_user=user.id) & Q(to_user=T_user.id))
+            if FollowRequest.objects.filter(Q(from_user=user.id) & Q(to_user=T_user.id)).exists():
+                F_requests=FollowRequest.objects.get(Q(from_user=user.id) & Q(to_user=T_user.id))
             print(user.followings.all())
             if user.followings.all().filter(following_user_id=T_user.id):
                 return Response({"message": "alredy followed"}, status=status.HTTP_302_FOUND)
             if F_requests:
-                F_requests.delete()
-                return Response({"message": "friend request canceled"}, status=status.HTTP_410_GONE)
+                if F_requests.is_active:
+                    F_requests.delete()
+                    return Response({"message": "friend request canceled"}, status=status.HTTP_410_GONE)
+                else:
+                    return Response({"message": "friend request is declined"}, status=status.HTTP_410_GONE)
             else:
-                serializer = FollowSerializer(data={'from_user':user.id,'to_user':T_user.id},partial=True)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
+                if T_user.is_public:
+                    UserFollowing.objects.create(user_id=T_user,
+                             following_user_id=user)
+                    return Response({"message": "you have followed user"}, status=status.HTTP_201_CREATED)
+                else:
+                    serializer = FollowSerializer(data={'from_user':user.id,'to_user':T_user.id},partial=True)
+                    serializer.is_valid(raise_exception=True)
+                    serializer.save()
+                    return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
 
 class accept_follow_request(APIView):
         permissions = [permissions.IsAuthenticated]
