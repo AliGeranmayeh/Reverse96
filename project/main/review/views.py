@@ -74,6 +74,8 @@ class user_review(APIView):
         _mutable = data._mutable
         data._mutable = True        # set to mutable
         data['user'] = request.user.id        # сhange the values you want
+        if not request.user.is_public:
+            data['is_public']=False
         data._mutable = _mutable        # set mutable flag back
         serializer = review_serializer(data=request.data,partial=True)
         serializer.is_valid(raise_exception=True)
