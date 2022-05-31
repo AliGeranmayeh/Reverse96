@@ -9,6 +9,7 @@ class Test_SetUp(APITestCase):
     def setUp(self):
         self.fake = Faker()
         self.register_url= reverse('register')
+        self.category_url = reverse('limited-area-category')
         self.login_url= reverse('login')
         self.email_verification_url= reverse('email-activision')
         self.user_data = {
