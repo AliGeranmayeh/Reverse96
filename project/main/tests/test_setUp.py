@@ -29,6 +29,27 @@ class Test_SetUp(APITestCase):
             "phone_number": f'{randint(1000000000, 9999999999)}',
             "is_active": True
         }
+        self.location_data = {
+            "name": "Azadi",
+            "long": 2,
+            "latt": 5,
+            "place_category": "3"
+        }
+
+        self.location_data1 = {
+            "name": "nazi abad",
+            "long": 1,
+            "latt": 3,
+            "place_category": "1"
+        }
+        self.location_data2 = {
+            "name": "zaferanie",
+            "long": 3,
+            "latt": 4,
+            "place_category": "1"
+        }
+
+
         return super().setUp()
 
 
