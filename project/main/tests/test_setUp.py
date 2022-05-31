@@ -41,7 +41,7 @@ class Test_SetUp(APITestCase):
             "name": "nazi abad",
             "long": 1,
             "latt": 3,
-            "place_category": "1"
+            "place_category": "7"
         }
         self.location_data2 = {
             "name": "zaferanie",
