@@ -20,7 +20,15 @@ class Test_SetUp(APITestCase):
             "phone_number": f'{randint(1000000000, 9999999999)}',
             "is_active":True
         }
-
+        self.user_data2 = {
+            "username": self.fake.email().split('@')[0],
+            "email": self.fake.email(),
+            "password": "12345",
+            "address": self.fake.address(),
+            "name": self.fake.name(),
+            "phone_number": f'{randint(1000000000, 9999999999)}',
+            "is_active": True
+        }
         return super().setUp()
 
 
