@@ -2,7 +2,7 @@ from functools import partial
 from django.db.models import Max
 from logging import raiseExceptions
 from rest_framework.views import APIView
-from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded
+from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded,Category_Serializer
 from rest_framework.response import Response
 from .models import review,locations, Comment
 from user.models import CustomUser
@@ -219,3 +219,18 @@ class RateView(APIView):
             return Response(content, status=status.HTTP_201_CREATED)
 
 
+class Category(APIView):
+    def post(self,request):
+        coordinates=request.data['coordinates']
+        serializer = Category_Serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)        
+        category= serializer.validated_data.get('place_category')
+
+        if category:
+            map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
+                & Q(long__range=[coordinates[1],coordinates[3]]) & Q(place_category= category))
+        else:
+             map_locations=locations.objects.distinct().filter(Q(latt__range=[coordinates[0],coordinates[2]])
+                & Q(long__range=[coordinates[1],coordinates[3]]))
+        s = Category_Serializer(map_locations,many=True)
+        return Response({'message': s.data},status=status.HTTP_200_OK)
