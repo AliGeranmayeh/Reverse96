@@ -76,7 +76,7 @@ class UserFollowingSerializer(serializers.ModelSerializer):
     username=serializers.SerializerMethodField('username_func')
     def picture_func(self,instance):
         img={}
-        img['picture']=instance.user_id.picture
+        img['picture']=instance.following_user_id.picture
         serializer=PictureSerializer(img)
         return serializer.data['picture']
     def username_func(self,instance):
@@ -91,16 +91,18 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     followings=serializers.SerializerMethodField('adding_followings')
     mutuals=serializers.SerializerMethodField('adding_mutuals')
     def adding_followers(self,instance):
-        serializer=UserFollowerSerializer(data=instance.followers.all(),many=True)
+        serializer=UserFollowerSerializer(data=instance.followings.all(),many=True)
         serializer.is_valid()
         return serializer.data
     def adding_followings(self,instance):
-        serializer=UserFollowingSerializer(data=instance.followings.all(),many=True)
+        serializer=UserFollowingSerializer(data=instance.followers.all(),many=True)
         serializer.is_valid()
         return serializer.data
     def adding_mutuals(self,instance):
         follower_list=list(instance.followings.all())
         following_list=list(instance.followers.all())
+        print(follower_list)
+        print(following_list)
         mutual_list=[]
         for i in follower_list:
             for j in following_list:
@@ -114,7 +116,7 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email',  'name', 'address',
+        fields = ['username', 'email',  'name', 'address','id',
                   'is_active', 'phone_number', 'picture','is_public','follow_state','followings',
                   'bio','description','liked','followers','mutuals']
         
