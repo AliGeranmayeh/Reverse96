@@ -11,5 +11,5 @@ class notification(models.Model):
     is_recieved=models.BooleanField(default=False)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
         

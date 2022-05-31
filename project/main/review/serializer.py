@@ -4,6 +4,8 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.fields import CurrentUserDefault
 from .models import locations, review, Comment
 
+class PictureSerializer(serializers.Serializer):
+    picture=serializers.ImageField(max_length=None, use_url=True, allow_null=False, required=True)
 
 class review_serializer(serializers.ModelSerializer):
     location_name=serializers.SerializerMethodField('get_name')
@@ -11,7 +13,10 @@ class review_serializer(serializers.ModelSerializer):
     def get_name(self,instance):
         return instance.location.name
     def get_picture(self,instance):
-        return instance.location.picture
+        img={}
+        img['picture']=instance.location.picture
+        serializer=PictureSerializer(img)
+        return serializer.data['picture']
     class Meta:
         model = review
         fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by','is_public',

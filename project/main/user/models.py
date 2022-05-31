@@ -30,9 +30,11 @@ class CustomUser(AbstractUser):
         return self.username
 
 class UserFollowing(models.Model):
-    user_id = models.ForeignKey(CustomUser, related_name="followings", on_delete=models.CASCADE)
-    following_user_id = models.ForeignKey(CustomUser, related_name="followers", on_delete=models.CASCADE)
+    user_id = models.ForeignKey(CustomUser, related_name="followers", on_delete=models.CASCADE)
+    following_user_id = models.ForeignKey(CustomUser, related_name="followings", on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.user_id.username
 
 class EmailValidation(models.Model):
     code = models.IntegerField(unique=False)
