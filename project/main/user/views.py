@@ -151,6 +151,7 @@ class send_follow_request(APIView):
         def post(self, request):
             user = request.user
             T_user=CustomUser.objects.get(username=request.data['to_user'])
+            F_requests=None
             if FollowRequest.objects.filter(Q(from_user=user.id) & Q(to_user=T_user.id)).exists():
                 F_requests=FollowRequest.objects.get(Q(from_user=user.id) & Q(to_user=T_user.id))
             print(user.followings.all())
@@ -184,8 +185,8 @@ class accept_follow_request(APIView):
                 return Response({"message": "no new follow request"}, status=status.HTTP_204_NO_CONTENT)
             if F_requests.is_active==True:
                 if request.data['accept']:
-                    UserFollowing.objects.create(user_id=user,
-                             following_user_id=F_user)
+                    UserFollowing.objects.create(following_user_id=user,
+                             user_id=F_user)
                     F_requests.delete()
                     return Response({"message": "follow request accepted"}, status=status.HTTP_202_ACCEPTED)
                 else:
