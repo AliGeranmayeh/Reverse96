@@ -23,7 +23,9 @@ class NotificationConsumer(WebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'notification.message',
-                'message': self.messages_to_json(notifs)
+                'message': {'messages':self.messages_to_json(notifs),
+                            'command': 'on_connect'
+                            }   
             }
         )
 

@@ -22,6 +22,8 @@ def send_notif(sender,instance,created, **kwargs):
         group_name,  # Group Name, Should always be string
         {
             "type": "notification_message",   # Custom Function written in the consumers.py
-            "message": data,
+            "message":{'messages':data,
+                        'command':'post_connect'
+                    }   
         },
     )
