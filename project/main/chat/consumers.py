@@ -110,7 +110,7 @@ class ChatConsumer(WebsocketConsumer):
                 'flag':message.flag,
                 'reply':message.reply.content,
                 'reply_id':message.reply.id,
-                'reply_user':message.reply.contact
+                'reply_user':message.reply.contact.username
         }
 
     commands = {
