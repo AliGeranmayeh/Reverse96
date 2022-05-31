@@ -79,5 +79,3 @@ class TestLogOut(Test_SetUp):
         r = self.client.post(self.logout_url, body)
         token = partial(RefreshToken, body['refresh'])
         self.assertRaises(TokenError, token)
-
-    
