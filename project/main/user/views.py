@@ -104,25 +104,25 @@ class LogoutView(GenericAPIView):
 class PublicProfileView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request, slug):
-        public_user_info = CustomUser.objects.get(username=slug)
-        serializer = PublicProfileSerializer(public_user_info, many=False)
-        if(not public_user_info):
+        try:
+            public_user_info = CustomUser.objects.get(username=slug)
+        except:
             return Response({'message':"user does not exist"} ,status=status.HTTP_404_NOT_FOUND)
+        serializer = PublicProfileSerializer(public_user_info, many=False)
+        #existed_public_user_info = CustomUser.objects.get(username=slug)
+        following_state=FollowRequest.objects.distinct().filter(Q(to_user=public_user_info.id)&Q(from_user=request.user))
+        if public_user_info.followers.all().filter(user_id=request.user.id).exists():
+            public_user_info.follow_state="following"
         else:
-            existed_public_user_info = CustomUser.objects.get(username=slug)
-            following_state=FollowRequest.objects.distinct().filter(Q(to_user=public_user_info.id)&Q(from_user=request.user))
-            if existed_public_user_info.followers.all().filter(user_id=request.user.id).exists():
-                existed_public_user_info.follow_state="following"
-            else:
-                if following_state:
-                    if following_state.is_active:
-                        existed_public_user_info.follow_state="pending"
-                    else:
-                        existed_public_user_info.follow_state="declined"
+            if following_state:
+                if following_state.is_active:
+                    public_user_info.follow_state="pending"
                 else:
-                    existed_public_user_info.follow_state="follow"
-            serializer = PublicProfileSerializer(existed_public_user_info, many=False)
-            return Response({'message': serializer.data},status=status.HTTP_200_OK)
+                    public_user_info.follow_state="declined"
+            else:
+                public_user_info.follow_state="follow"
+        serializer = PublicProfileSerializer(public_user_info, many=False)
+        return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
 class get_user_detail(APIView):
     permissions = [permissions.IsAuthenticated]
