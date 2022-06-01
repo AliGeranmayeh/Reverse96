@@ -44,17 +44,17 @@ class NotificationConsumer(WebsocketConsumer):
             for i in recieved_id:
                 notif=notification.objects.get(id=i)
                 notif.delete()
-
-        message = text_data_json['message']
-        print(message)
-        # Send message to room group
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'notification.message',
-                'message': message
-            }
-        )
+        if not(text_data_json['message'] is None):
+            message = text_data_json['message']
+            print(message)
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'notification.message',
+                    'message': message
+                }
+            )
     def messages_to_json(self, notifs):
         result = []
         for notif in notifs:
