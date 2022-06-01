@@ -18,6 +18,7 @@ from random import randint
 from rest_framework.generics import GenericAPIView
 from rest_framework import permissions
 from rest_framework.parsers import MultiPartParser, FormParser
+from notification.models import notification        
 
 def randomNumber():
     value = randint(1000, 9999)
@@ -114,9 +115,17 @@ class PublicProfileView(APIView):
         if public_user_info.followers.all().filter(user_id=request.user.id).exists():
             public_user_info.follow_state="following"
         else:
-            if following_state:
-                if following_state.is_active:
-                    public_user_info.follow_state="pending"
+            existed_public_user_info = CustomUser.objects.get(username=slug)
+            dum_following_state=FollowRequest.objects.distinct().filter(Q(to_user=public_user_info.id)&Q(from_user=request.user))
+            following_state=dum_following_state.first()
+            if existed_public_user_info.followers.all().filter(user_id=request.user.id).exists():
+                existed_public_user_info.follow_state="following"
+            else:
+                if following_state:
+                    if following_state.is_active:
+                        existed_public_user_info.follow_state="pending"
+                    else:
+                        existed_public_user_info.follow_state="declined"
                 else:
                     public_user_info.follow_state="declined"
             else:
@@ -165,13 +174,15 @@ class send_follow_request(APIView):
                     return Response({"message": "friend request is declined"}, status=status.HTTP_410_GONE)
             else:
                 if T_user.is_public:
-                    UserFollowing.objects.create(user_id=T_user,
-                             following_user_id=user)
+                    UserFollowing.objects.create(user_id=user,
+                             following_user_id=T_user)
+                    notification.objects.create(to_user=T_user,from_user=user,content='followed_you')
                     return Response({"message": "you have followed user"}, status=status.HTTP_201_CREATED)
                 else:
                     serializer = FollowSerializer(data={'from_user':user.id,'to_user':T_user.id},partial=True)
                     serializer.is_valid(raise_exception=True)
                     serializer.save()
+                    notification.objects.create(to_user=T_user,from_user=user,content='follow_request')
                     return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
 
 class accept_follow_request(APIView):
@@ -187,6 +198,7 @@ class accept_follow_request(APIView):
                 if request.data['accept']:
                     UserFollowing.objects.create(following_user_id=user,
                              user_id=F_user)
+                    notification.objects.create(to_user=F_user,from_user=user,content='follow_request_accepted')
                     F_requests.delete()
                     return Response({"message": "follow request accepted"}, status=status.HTTP_202_ACCEPTED)
                 else:

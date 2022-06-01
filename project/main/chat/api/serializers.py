@@ -15,7 +15,7 @@ class ChatSerializer(serializers.ModelSerializer):
     participants = ContactSerializer(many=True)
     class Meta:
         model = Chat
-        fields = ('id', 'messages', 'participants', 'name','picture','description')
+        fields = ('id', 'messages', 'participants', 'name','description')
         read_only = ('id')
 
     def create(self, validated_data):
@@ -26,7 +26,6 @@ class ChatSerializer(serializers.ModelSerializer):
             contact = get_user_contact(username)
             chat.participants.add(contact)
         chat.name=validated_data['name']
-        chat.picture=validated_data['picture']
         chat.description=validated_data['description']
         chat.save()
         return chat
