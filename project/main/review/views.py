@@ -83,7 +83,7 @@ class user_review(APIView):
         serializer.save()
         users=request.user.followings.all()
         for i in users:
-            notification.objects.create(from_user=request.user,to_user=i.user_id)
+            notification.objects.create(from_user=request.user,to_user=i.user_id,content='new_review')
         return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
 
 class get_user_reviews(APIView):

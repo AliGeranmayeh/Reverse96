@@ -15,7 +15,8 @@ def send_notif(sender,instance,created, **kwargs):
     channel_layer = get_channel_layer()
     data = {
             "from":instance.from_user.username,
-            "notif_id":instance.id
+            "notif_id":instance.id,
+            "notif":instance.content
             }
     group_name="notification_%s" % current_user.username
     async_to_sync(channel_layer.group_send)(
