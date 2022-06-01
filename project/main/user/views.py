@@ -166,14 +166,15 @@ class send_follow_request(APIView):
                     return Response({"message": "friend request is declined"}, status=status.HTTP_410_GONE)
             else:
                 if T_user.is_public:
-                    UserFollowing.objects.create(user_id=T_user,
-                             following_user_id=user)
-                    notification.objects.create(to_user=T_user,from_user=user,content='follow_request')
+                    UserFollowing.objects.create(user_id=user,
+                             following_user_id=T_user)
+                    notification.objects.create(to_user=T_user,from_user=user,content='followed_you')
                     return Response({"message": "you have followed user"}, status=status.HTTP_201_CREATED)
                 else:
                     serializer = FollowSerializer(data={'from_user':user.id,'to_user':T_user.id},partial=True)
                     serializer.is_valid(raise_exception=True)
                     serializer.save()
+                    notification.objects.create(to_user=T_user,from_user=user,content='follow_request')
                     return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
 
 class accept_follow_request(APIView):
