@@ -127,9 +127,7 @@ class PublicProfileView(APIView):
                     else:
                         existed_public_user_info.follow_state="declined"
                 else:
-                    public_user_info.follow_state="declined"
-            else:
-                public_user_info.follow_state="follow"
+                    existed_public_user_info.follow_state="follow"
         serializer = PublicProfileSerializer(public_user_info, many=False)
         return Response({'message': serializer.data},status=status.HTTP_200_OK)
 
