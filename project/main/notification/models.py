@@ -9,6 +9,7 @@ class notification(models.Model):
     content=models.CharField(max_length=50,null=True,blank=True)
     created=models.DateTimeField(auto_now_add=True)
     is_recieved=models.BooleanField(default=False)
+    bazi=models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
