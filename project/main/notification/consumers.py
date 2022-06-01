@@ -60,7 +60,8 @@ class NotificationConsumer(WebsocketConsumer):
         for notif in notifs:
             result.append({
             "from":notif.from_user.username,
-            "notif_id":notif.id
+            "notif_id":notif.id,
+            "notif":notif.content
             })
         return result   
 

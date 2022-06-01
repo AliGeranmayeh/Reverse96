@@ -18,6 +18,7 @@ from random import randint
 from rest_framework.generics import GenericAPIView
 from rest_framework import permissions
 from rest_framework.parsers import MultiPartParser, FormParser
+from notification.models import notification        
 
 def randomNumber():
     value = randint(1000, 9999)
@@ -167,6 +168,7 @@ class send_follow_request(APIView):
                 if T_user.is_public:
                     UserFollowing.objects.create(user_id=T_user,
                              following_user_id=user)
+                    notification.objects.create(to_user=T_user,from_user=user,content='follow_request')
                     return Response({"message": "you have followed user"}, status=status.HTTP_201_CREATED)
                 else:
                     serializer = FollowSerializer(data={'from_user':user.id,'to_user':T_user.id},partial=True)
