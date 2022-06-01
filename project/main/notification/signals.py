@@ -6,12 +6,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import notification
 from django.db.models.query import QuerySet
-i=0
-@receiver(post_save, sender=notification,dispatch_uid="my_unique_identifier")
 def send_notif(sender,instance,raw,created, **kwargs):
 
-    if i==0:
-        i=i+1
+    if raw:
         print(instance)
         current_user = instance.to_user # Getting current user
         

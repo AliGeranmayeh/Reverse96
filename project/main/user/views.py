@@ -111,7 +111,8 @@ class PublicProfileView(APIView):
             return Response({'message':"user does not exist"} ,status=status.HTTP_404_NOT_FOUND)
         else:
             existed_public_user_info = CustomUser.objects.get(username=slug)
-            following_state=FollowRequest.objects.distinct().filter(Q(to_user=public_user_info.id)&Q(from_user=request.user))
+            dum_following_state=FollowRequest.objects.distinct().filter(Q(to_user=public_user_info.id)&Q(from_user=request.user))
+            following_state=dum_following_state.first()
             if existed_public_user_info.followers.all().filter(user_id=request.user.id).exists():
                 existed_public_user_info.follow_state="following"
             else:
