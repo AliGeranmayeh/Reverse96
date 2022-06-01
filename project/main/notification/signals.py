@@ -22,7 +22,7 @@ def send_notif(sender,instance,created, **kwargs):
     async_to_sync(channel_layer.group_send)(
         group_name,  # Group Name, Should always be string
         {
-            "type": "notification_message",   # Custom Function written in the consumers.py
+            "type": "notification.message",   # Custom Function written in the consumers.py
             "message":{'messages':data,
                         'command':'post_connect'
                     }   
