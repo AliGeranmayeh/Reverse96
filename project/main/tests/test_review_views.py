@@ -39,6 +39,49 @@ class Testaddreview(Test_SetUp):
         #import pdb; pdb.set_trace()
         self.assertEqual(response.status_code, 201)
 
+    def test_get_location_reviews_with_200_204(self):
+        location = locations.objects.create(
+            name= self.location_data["name"],
+            long=self.location_data["long"],
+            latt=self.location_data["latt"],
+            place_category=self.location_data["place_category"]
+        )
+        location1 = locations.objects.create(
+            name= self.location_data["name"],
+            long=self.location_data["long"],
+            latt=self.location_data["latt"],
+            place_category=self.location_data["place_category"]
+        )
+        user = get_user_model().objects.create_user(
+            username=self.user_data['username'],
+            password=self.user_data['password'],
+            phone_number=self.user_data['phone_number'],
+            address=self.user_data['address'],
+            email=self.user_data['email'],
+            name=self.user_data['name'],
+            is_active=True
+        )
+        review1=review.objects.create(
+            title="user2 review",
+            text = "bad place",
+            is_public=False,
+            user=user,
+            location=location
+        )
+        data = {
+            "username": self.user_data['username'],
+            "password": self.user_data['password'],
+        }
+        res = self.client.post(self.login_url, data, format='json')
+        url=f'/api/get_location_reviews/{location.id}'
+        header = self.client.credentials(HTTP_AUTHORIZATION='Bearer %s' % res.json()['access'])
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.status_code, 200)
+        url1=f'/api/get_location_reviews/{location1.id}'
+        header = self.client.credentials(HTTP_AUTHORIZATION='Bearer %s' % res.json()['access'])
+        response = self.client.get(url1, format="json")
+        self.assertEqual(response.status_code, 204)
+
     def test_get_reviews_api_response(self):
         location = locations.objects.create(
             name= self.location_data["name"],
