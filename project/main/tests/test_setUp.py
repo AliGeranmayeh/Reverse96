@@ -11,6 +11,7 @@ class Test_SetUp(APITestCase):
         self.register_url= reverse('register')
         self.category_url = reverse('limited-area-category')
         self.login_url= reverse('login')
+        self.review_url=reverse("user_review")
         self.email_verification_url= reverse('email-activision')
         self.user_data = {
             "username": self.fake.email().split('@')[0],
@@ -49,7 +50,16 @@ class Test_SetUp(APITestCase):
             "latt": 4,
             "place_category": "1"
         }
-
+        self.review_data={
+            "title":"user1 review",
+            "text" : "good place",
+            "is_public":True
+        }
+        self.review_data2={
+            "title":"user2 review",
+            "text" : "bad place",
+            "is_public":False
+        }
 
         return super().setUp()
 
