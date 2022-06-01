@@ -59,21 +59,48 @@ class Testaddreview(Test_SetUp):
             "username": self.user_data['username'],
             "password": self.user_data['password'],
         }
-        review1=review.objects.create({
-            "title":"user2 review",
-            "text" : "bad place",
-            "is_public":False,
-            "user":user.id,
-            "location":location.id
-        })
+        review1=review.objects.create(
+            title="user2 review",
+            text = "bad place",
+            is_public=False,
+            user=user,
+            location=location
+        )
         res = self.client.post(self.login_url, data, format='json')
-        get_reviews_url = "/api/public-profile/1"
+        get_reviews_url = "/api/get_reviews/1"
         header = self.client.credentials(HTTP_AUTHORIZATION='Bearer %s' % res.json()['access'])
-        response = self.client.get(self.review_url,get_reviews_url, format="json")
-        # import pdb; pdb.set_trace()
+        response = self.client.get(get_reviews_url, format="json")
+        self.assertEqual(response.status_code, 200)
 
+        get_reviews_url = "/api/get_reviews/2"
+        header = self.client.credentials(HTTP_AUTHORIZATION='Bearer %s' % res.json()['access'])
+        response = self.client.get(get_reviews_url, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        get_reviews_url = "/api/get_reviews/5"
+        header = self.client.credentials(HTTP_AUTHORIZATION='Bearer %s' % res.json()['access'])
+        response = self.client.get(get_reviews_url, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_category_response_with_200(self):
+        location = locations.objects.create(
+            name= self.location_data["name"],
+            long=self.location_data["long"],
+            latt=self.location_data["latt"],
+            place_category=self.location_data["place_category"]
+        )
+        data = {
+            "coordinates": [1,1,5,5],
+        }
+        get_map_location_url = "/api/get_map_locations"
+        res = self.client.post(get_map_location_url, data, format='json')
         #import pdb; pdb.set_trace()
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(res.status_code, 200)
+
+        get_map_locations_url = "/api/get_map_location_reviews"
+        res = self.client.post(get_map_locations_url, data, format='json')
+        #import pdb; pdb.set_trace()
+        self.assertEqual(res.status_code, 200)
     
 
     def test_user_can_successfully_add_rivew(self):
