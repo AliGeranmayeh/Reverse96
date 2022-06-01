@@ -9,10 +9,6 @@ class ContactSerializer(serializers.StringRelatedField):
     def to_internal_value(self, value):
         return value
 
-class nameSerializer(serializers.StringRelatedField):
-    def to_internal_value(self, value):
-        return value
-
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -23,7 +19,6 @@ class ChatSerializer(serializers.ModelSerializer):
         read_only = ('id')
 
     def create(self, validated_data):
-        print(validated_data)
         participants = validated_data.pop('participants')
         chat = Chat()
         chat.save()
