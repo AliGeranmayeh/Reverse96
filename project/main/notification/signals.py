@@ -26,5 +26,5 @@ def send_notif(sender,instance,created, **kwargs):
             "message":{'messages':data,
                         'command':'post_connect'
                     }   
-        },
+        }
     )
