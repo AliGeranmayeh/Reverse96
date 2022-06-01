@@ -190,6 +190,7 @@ class accept_follow_request(APIView):
                 if request.data['accept']:
                     UserFollowing.objects.create(following_user_id=user,
                              user_id=F_user)
+                    notification.objects.create(to_user=F_user,from_user=user,content='follow_request_accepted')
                     F_requests.delete()
                     return Response({"message": "follow request accepted"}, status=status.HTTP_202_ACCEPTED)
                 else:
