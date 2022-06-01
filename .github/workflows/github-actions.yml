@@ -27,4 +27,3 @@ jobs:
         run: |
           cd ./project/main/
           python manage.py test
-          coverage report 
