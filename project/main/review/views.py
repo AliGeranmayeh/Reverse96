@@ -6,7 +6,7 @@ from .serializer import review_serializer, location_serializer,CommentSerializer
 from rest_framework.response import Response
 from .models import review,locations, Comment
 from user.models import CustomUser
-from notification.models import notification
+from notification.views import notif
 from rest_framework import permissions, status
 from django.db.models import Q
 from django.core.mail import send_mail
@@ -83,7 +83,7 @@ class user_review(APIView):
         serializer.save()
         users=request.user.followings.all()
         for i in users:
-            notification.objects.create(from_user=request.user,to_user=i.user_id,content='new_review')
+            notif(user=request.user,T_user=i.user_id,content='new_review')
         return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
 
 class get_user_reviews(APIView):

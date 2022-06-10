@@ -18,7 +18,7 @@ from random import randint
 from rest_framework.generics import GenericAPIView
 from rest_framework import permissions
 from rest_framework.parsers import MultiPartParser, FormParser
-from notification.models import notification        
+from notification.views import notif        
 
 def randomNumber():
     value = randint(1000, 9999)
@@ -169,13 +169,13 @@ class send_follow_request(APIView):
                 if T_user.is_public:
                     UserFollowing.objects.create(user_id=user,
                              following_user_id=T_user)
-                    notification.objects.create(to_user=T_user,from_user=user,content='followed_you')
+                    notif(T_user,user,content='followed_you')
                     return Response({"message": "you have followed user"}, status=status.HTTP_201_CREATED)
                 else:
                     serializer = FollowSerializer(data={'from_user':user.id,'to_user':T_user.id},partial=True)
                     serializer.is_valid(raise_exception=True)
                     serializer.save()
-                    notification.objects.create(to_user=T_user,from_user=user,content='follow_request')
+                    notif(T_user,user,'follow_request')
                     return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
 
 class accept_follow_request(APIView):
@@ -191,7 +191,7 @@ class accept_follow_request(APIView):
                 if request.data['accept']:
                     UserFollowing.objects.create(following_user_id=user,
                              user_id=F_user)
-                    notification.objects.create(to_user=F_user,from_user=user,content='follow_request_accepted')
+                    notif(T_user=F_user,user=user,content='follow_request_accepted')
                     F_requests.delete()
                     return Response({"message": "follow request accepted"}, status=status.HTTP_202_ACCEPTED)
                 else:
