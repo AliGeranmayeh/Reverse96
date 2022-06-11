@@ -39,12 +39,12 @@ class NotificationConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        if not(text_data_json['received_id'] is None):
+        if ('received_id' in text_data_json):
             recieved_id=text_data_json['received_id']
             for i in recieved_id:
                 notif=notification.objects.get(id=i)
                 notif.delete()
-        if not(text_data_json['message'] is None):
+        if ('message' in text_data_json):
             message = text_data_json['message']
             print(message)
             # Send message to room group

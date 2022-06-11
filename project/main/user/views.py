@@ -162,9 +162,9 @@ class send_follow_request(APIView):
             if F_requests:
                 if F_requests.is_active:
                     F_requests.delete()
-                    return Response({"message": "friend request canceled"}, status=status.HTTP_410_GONE)
+                    return Response({"message": "friend request canceled"}, status=status.HTTP_200_OK)
                 else:
-                    return Response({"message": "friend request is declined"}, status=status.HTTP_410_GONE)
+                    return Response({"message": "friend request is declined"}, status=status.HTTP_200_OK)
             else:
                 if T_user.is_public:
                     UserFollowing.objects.create(user_id=user,
