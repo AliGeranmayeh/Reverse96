@@ -31,7 +31,8 @@ class ChatSerializer(serializers.ModelSerializer):
             contact = get_user_contact(username)
             chat.participants.add(contact)
         chat.name=validated_data['name']
-        chat.description=validated_data['description']
+        if 'description' in validated_data:
+            chat.description=validated_data['description']
         chat.save()
         return chat
 
