@@ -257,3 +257,6 @@ class SearchView(APIView):
                          'users':user_serializer.data},status=status.HTTP_302_FOUND)
 
 
+class SearchUserView(APIView):
+    def get(self):
+        pass
