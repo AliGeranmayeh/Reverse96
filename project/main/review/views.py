@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded,Category_Serializer
 from rest_framework.response import Response
 from .models import review,locations, Comment
+from user.serializer import UserDetailSerializer
 from user.models import CustomUser
 from notification.views import notif
 from rest_framework import permissions, status
@@ -238,3 +239,40 @@ class Category(APIView):
                 & Q(long__range=[coordinates[1],coordinates[3]]))
         s = Category_Serializer(map_locations,many=True)
         return Response({'message': s.data},status=status.HTTP_200_OK)
+
+
+class SearchView(APIView):
+    def get(self,request,pk):
+        print(pk)
+        #request.query_params('search')
+        find_locations = locations.objects.filter(name__icontains= pk)
+        loc_serializer = location_review_serializer(find_locations,many=True)
+        find_review = review.objects.filter(title__icontains= pk)
+        rev_serializer = review_serializer(find_review,many=True)
+        find_user = CustomUser.objects.filter(username__icontains= pk)
+        user_serializer = UserDetailSerializer(find_user,many=True)
+        #import pdb; pdb.set_trace()
+        return Response({'locations':loc_serializer.data,
+                        'reviews': rev_serializer.data,
+                         'users':user_serializer.data},status=status.HTTP_302_FOUND)
+
+
+class SearchUserView(APIView):
+    def get(self, request, pk):
+        find_user = CustomUser.objects.filter(username__icontains=pk)
+        user_serializer = UserDetailSerializer(find_user, many=True)
+        return Response(user_serializer.data, status=status.HTTP_302_FOUND)
+
+
+class SearchLocationView(APIView):
+    def get(self, request, pk):
+        find_locations = locations.objects.filter(name__icontains=pk)
+        loc_serializer = location_review_serializer(find_locations, many=True)
+        return Response(loc_serializer.data, status=status.HTTP_302_FOUND)
+
+
+class SearchReviewView(APIView):
+    def get(self, request, pk):
+        find_review = review.objects.filter(title__icontains=pk)
+        rev_serializer = review_serializer(find_review, many=True)
+        return  Response(rev_serializer.data, status=status.HTTP_302_FOUND)
