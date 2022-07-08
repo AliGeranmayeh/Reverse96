@@ -273,4 +273,6 @@ class SearchLocationView(APIView):
 
 class SearchReviewView(APIView):
     def get(self, request, pk):
-        pass
+        find_review = review.objects.filter(title__icontains=pk)
+        rev_serializer = review_serializer(find_review, many=True)
+        return  Response(rev_serializer.data, status=status.HTTP_302_FOUND)
