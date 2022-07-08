@@ -265,5 +265,7 @@ class SearchUserView(APIView):
 
 
 class SearchLocationView(APIView):
-    def get(self):
-        pass
+    def get(self, request, pk):
+        find_locations = locations.objects.filter(name__icontains=pk)
+        loc_serializer = location_review_serializer(find_locations, many=True)
+        return Response(loc_serializer.data, status=status.HTTP_302_FOUND)
