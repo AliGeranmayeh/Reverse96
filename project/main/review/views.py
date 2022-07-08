@@ -262,3 +262,8 @@ class SearchUserView(APIView):
         find_user = CustomUser.objects.filter(username__icontains=pk)
         user_serializer = UserDetailSerializer(find_user, many=True)
         return Response(user_serializer.data, status=status.HTTP_302_FOUND)
+
+
+class SearchLocationView(APIView):
+    def get(self):
+        pass
