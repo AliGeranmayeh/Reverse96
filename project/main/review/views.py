@@ -241,7 +241,7 @@ class Category(APIView):
         return Response({'message': s.data},status=status.HTTP_200_OK)
 
 
-class Search(APIView):
+class SearchView(APIView):
     def get(self,request,pk):
         print(pk)
         #request.query_params('search')
@@ -255,3 +255,5 @@ class Search(APIView):
         return Response({'locations':loc_serializer.data,
                         'reviews': rev_serializer.data,
                          'users':user_serializer.data},status=status.HTTP_302_FOUND)
+
+
