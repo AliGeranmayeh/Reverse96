@@ -1,0 +1,10 @@
+[report]
+omit=
+    */env/*
+    */venv/*
+    */tests/*
+    */staticfiles/*
+    */migrations/*
+    */__init__.py  
+    */admin.py
+    */urls.py     	
