@@ -4,5 +4,5 @@ omit=
     */venv/*
     */tests/*
     */staticfiles/*
-    */migrations/*
-    */__init__.py      	
+    */migrations/*     	
+    */__init__.py 
