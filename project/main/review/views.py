@@ -243,7 +243,7 @@ class Category(APIView):
 
 class SearchView(APIView):
     def get(self,request,pk):
-        print(pk)
+        #print(pk)
         #request.query_params('search')
         find_locations = locations.objects.filter(name__icontains= pk)
         loc_serializer = location_review_serializer(find_locations,many=True)
@@ -251,6 +251,8 @@ class SearchView(APIView):
         rev_serializer = review_serializer(find_review,many=True)
         find_user = CustomUser.objects.filter(username__icontains= pk)
         user_serializer = UserDetailSerializer(find_user,many=True)
+        if (loc_serializer.data ==[] and rev_serializer.data ==[] and user_serializer.data==[]):
+            return Response(status=status.HTTP_404_NOT_FOUND)
         #import pdb; pdb.set_trace()
         return Response({'locations':loc_serializer.data,
                         'reviews': rev_serializer.data,
@@ -261,18 +263,27 @@ class SearchUserView(APIView):
     def get(self, request, pk):
         find_user = CustomUser.objects.filter(username__icontains=pk)
         user_serializer = UserDetailSerializer(find_user, many=True)
-        return Response(user_serializer.data, status=status.HTTP_302_FOUND)
+        if user_serializer.data == []:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(user_serializer.data, status=status.HTTP_302_FOUND)
 
 
 class SearchLocationView(APIView):
     def get(self, request, pk):
         find_locations = locations.objects.filter(name__icontains=pk)
         loc_serializer = location_review_serializer(find_locations, many=True)
-        return Response(loc_serializer.data, status=status.HTTP_302_FOUND)
+        if loc_serializer.data == []:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(loc_serializer.data, status=status.HTTP_302_FOUND)
 
 
 class SearchReviewView(APIView):
     def get(self, request, pk):
         find_review = review.objects.filter(title__icontains=pk)
         rev_serializer = review_serializer(find_review, many=True)
-        return  Response(rev_serializer.data, status=status.HTTP_302_FOUND)
+        if rev_serializer.data == []:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(rev_serializer.data, status=status.HTTP_302_FOUND)
