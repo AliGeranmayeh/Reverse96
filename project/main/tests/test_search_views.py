@@ -9,4 +9,4 @@ class TestSearch(Test_SetUp):
         search_url= f"api/search/{test_search}"
         response = self.client.get(search_url, format="json")
         #import pdb; pdb.set_trace()
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 404)
