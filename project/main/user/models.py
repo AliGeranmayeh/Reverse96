@@ -16,7 +16,7 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=11, unique=True)
     picture = models.ImageField(null=True, blank=True, upload_to='media/profiles/', default='profiles/default.png')
     address = models.TextField()
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_public=models.BooleanField(default=True)
     liked=models.ManyToManyField('review.review', related_name='liked', blank=True )
     #followings=models.ForeignKey('self',blank=True,related_name='followings',on_delete=)
