@@ -22,6 +22,7 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     reply=models.OneToOneField('self', null=True, blank=True, on_delete=models.CASCADE)
     flag=models.BooleanField(default=False)
+    edited=models.BooleanField(default=False)
 
     def __str__(self):
         return self.content

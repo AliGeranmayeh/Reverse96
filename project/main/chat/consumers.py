@@ -75,7 +75,8 @@ class ChatConsumer(WebsocketConsumer):
     def edit_message(self, data):
         message=get_reply_message(data['chatId'],data['id'])
         message.content=data['message']
-        message.save(update_fields=['content'])
+        message.edited=True
+        message.save(update_fields=['content','edited'])
         self.send_command_to_front()
 
     
@@ -99,6 +100,7 @@ class ChatConsumer(WebsocketConsumer):
                 'author': message.contact.username,
                 'content': message.content,
                 'timestamp': str(message.timestamp),
+                'edited':message.edited,
                 'flag':message.flag
         }
         else:
@@ -107,6 +109,7 @@ class ChatConsumer(WebsocketConsumer):
                 'author': message.contact.username,
                 'content': message.content,
                 'timestamp': str(message.timestamp),
+                'edited':message.edited,
                 'flag':message.flag,
                 'reply':message.reply.content,
                 'reply_id':message.reply.id,
