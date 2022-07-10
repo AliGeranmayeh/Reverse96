@@ -1,43 +1,16 @@
-version: '3'
+kind: ExternalService
+name: reverse96-deploy
+spec: 
+  image: reverse_test:1.0
+  image_pull_policy: Always # or default is IfNotPresent
+  replicas: 1
+  resources:
+    memory: 100Mi
+  env:
+  - name: POSTGRESS_PASSWORD
+  value: test123
+  - name: POSTGRESS_HOST
+  value: postgress
+  
 
-volumes:
-  my_awesome_project_local_postgres_data: {}
-  my_awesome_project_local_postgres_data_backups: {}
-
-services:
-  django:
-    build:
-      context: .
-      dockerfile: ./compose/local/django/Dockerfile
-    image: reverse96_django
-    container_name: reverse96_django
-    platform: linux/x86_64
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - .:/app:z
-    env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
-    ports:
-      - "8000:8000"
-    command: /start
-
-  postgres:
-    build:
-      context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: reverse96_postgres
-    container_name: reverse96_postgres
-    volumes:
-      - my_awesome_project_local_postgres_data:/var/lib/postgresql/data:Z
-      - my_awesome_project_local_postgres_data_backups:/backups:z
-    env_file:
-      - ./.envs/.local/.postgres
-
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
 

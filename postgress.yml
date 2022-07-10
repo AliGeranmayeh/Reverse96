@@ -1,0 +1,14 @@
+kind: ManagedService
+name: db
+spec:
+  service_name: postgresql
+  version: 10.16
+  parameters:
+    - name: adminer_enabled
+      value: true
+    - name: postgres_password
+      value: test123
+    - name: volume_name
+      value: testuser
+  resources:
+      memory: 100Mi
