@@ -21,6 +21,9 @@ urlpatterns = [
     path('rates/<str:pk>', views.ViewRateView.as_view(), name="all-rates"),
     path('add_user_like/<str:pk>', views.RateView.as_view(), name="add-rate"),
     path('category', views.Category.as_view(), name="limited-area-category"),
-
+    path('search/<slug:pk>',views.SearchView.as_view(),name= "search"),
+    path('u_search/<slug:pk>',views.SearchUserView.as_view(),name= "search_user"),
+    path('l_search/<slug:pk>',views.SearchLocationView.as_view(),name= "search_location"),
+    path('r_search/<slug:pk>',views.SearchReviewView.as_view(),name= "search_review"),
 
 ]

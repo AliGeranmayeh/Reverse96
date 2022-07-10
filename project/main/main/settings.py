@@ -34,7 +34,8 @@ SECRET_KEY = 'django-insecure-z6rni+)z-d7gv$vteu5yua3+r=u7j8o1=b1(=+02ix)!9rc3v0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["reverse96-deploy-reverse96.fandogh.cloud","localhost","0.0.0.0","127.0.0.1"]
+
+ALLOWED_HOSTS = ["reverse96-reverse96.fandogh.cloud","localhost","0.0.0.0","127.0.0.1"]
 
 # Application definition
 
