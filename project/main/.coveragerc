@@ -6,3 +6,4 @@ omit=
     */staticfiles/*
     */migrations/*     	
     */__init__.py 
+    */tests.py

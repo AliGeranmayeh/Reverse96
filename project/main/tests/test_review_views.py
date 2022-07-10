@@ -3,41 +3,41 @@ from django.contrib.auth import get_user_model
 from review.models import locations,review
 
 class Testaddreview(Test_SetUp):
-    # def test_review_response_with_201(self):
-    #     location = locations.objects.create(
-    #         name= self.location_data["name"],
-    #         long=self.location_data["long"],
-    #         latt=self.location_data["latt"],
-    #         place_category=self.location_data["place_category"]
-    #     )
-    #     user = get_user_model().objects.create_user(
-    #         username=self.user_data['username'],
-    #         password=self.user_data['password'],
-    #         phone_number=self.user_data['phone_number'],
-    #         address=self.user_data['address'],
-    #         email=self.user_data['email'],
-    #         name=self.user_data['name'],
-    #         is_active=True
-    #     )
-    #     data = {
-    #         "username": self.user_data['username'],
-    #         "password": self.user_data['password'],
-    #     }
-    #     review_data={
-    #         "title":"user2 review",
-    #         "text" : "bad place",
-    #         "is_public":False,
-    #         "user":user.id,
-    #         "location":location.id
-    #     }
-    #     res = self.client.post(self.login_url, data, format='json')
-    #
-    #     header = self.client.credentials(HTTP_AUTHORIZATION='Bearer %s' % res.json()['access'])
-    #     response = self.client.post(self.review_url,review_data, format="json")
-    #     # import pdb; pdb.set_trace()
-    #
-    #     #import pdb; pdb.set_trace()
-    #     self.assertEqual(response.status_code, 201)
+    def test_review_response_with_201(self):
+        location = locations.objects.create(
+            name= self.location_data["name"],
+            long=self.location_data["long"],
+            latt=self.location_data["latt"],
+            place_category=self.location_data["place_category"]
+        )
+        user = get_user_model().objects.create_user(
+            username=self.user_data['username'],
+            password=self.user_data['password'],
+            phone_number=self.user_data['phone_number'],
+            address=self.user_data['address'],
+            email=self.user_data['email'],
+            name=self.user_data['name'],
+            is_active=True
+        )
+        data = {
+            "username": self.user_data['username'],
+            "password": self.user_data['password'],
+        }
+        review_data={
+            "title":"user2 review",
+            "text" : "bad place",
+            "is_public":False,
+            "user":user.id,
+            "location":location.id
+        }
+        res = self.client.post(self.login_url, data, format='json')
+
+        header = self.client.credentials(HTTP_AUTHORIZATION='Bearer %s' % res.json()['access'])
+        response = self.client.post(self.review_url,review_data)
+        # import pdb; pdb.set_trace()
+
+        #import pdb; pdb.set_trace()
+        self.assertEqual(response.status_code, 201)
 
     def test_get_location_reviews_with_200_204(self):
         location = locations.objects.create(
