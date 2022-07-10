@@ -55,7 +55,7 @@ class location_review_serializer(serializers.ModelSerializer):
 
     class Meta:
         model = locations
-        fields = ('id','name','picture','long','latt','no_of_likes','reviews','no_of_reviews')
+        fields = ('id','name','picture','long','latt','no_of_likes','reviews','no_of_reviews','place_category')
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -89,8 +89,14 @@ class Category_Serializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
     long = serializers.DecimalField(max_digits=23, decimal_places=15, required=False)
     latt = serializers.DecimalField(max_digits=23, decimal_places=15, required=False)
+    reviews = serializers.SerializerMethodField('my_function')
+
+    def my_function(self, locations):
+        serializer = review_serializer(data=locations.review_set.all(), many=True)
+        serializer.is_valid()
+        return serializer.data
     def no_of_reviews_function(self,locations):
         return len(locations.review_set.all())
     class Meta:
         model = locations
-        fields = ('id', 'name', 'picture', 'long', 'latt', 'no_of_likes', 'no_of_reviews', 'place_category',)
+        fields = ('id', 'name', 'picture', 'long', 'latt', 'no_of_likes', 'no_of_reviews', 'place_category','reviews')
