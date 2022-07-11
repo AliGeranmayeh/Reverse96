@@ -2,7 +2,7 @@ from functools import partial
 from django.db.models import Max
 from logging import raiseExceptions
 from rest_framework.views import APIView
-from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded,Category_Serializer
+from .serializer import review_serializer, location_serializer,CommentSerializer, CommentCreationSerializer, location_review_serializer, review_serializer_username_inlcluded,Category_Serializer, user_review_serializer
 from rest_framework.response import Response
 from .models import review,locations, Comment
 from user.serializer import UserDetailSerializer
@@ -92,7 +92,7 @@ class get_user_reviews(APIView):
     def get(self,requst,slug=None):
         user_revs=CustomUser.objects.get(username=slug)
         reviews=review.objects.filter(user=user_revs).order_by('-date_created')
-        serializer=review_serializer(reviews,many=True)
+        serializer=user_review_serializer(reviews,many=True)
         return Response({"message": serializer.data}, status=status.HTTP_200_OK)
 
 class delete_user_reviews(APIView):

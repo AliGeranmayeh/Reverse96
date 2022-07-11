@@ -61,7 +61,8 @@ class NotificationConsumer(WebsocketConsumer):
             result.append({
             "from":notif.from_user.username,
             "notif_id":notif.id,
-            "notif":notif.content
+            "notif":notif.content,
+            "picture":notif.from_user.picture.url
             })
         return result   
 

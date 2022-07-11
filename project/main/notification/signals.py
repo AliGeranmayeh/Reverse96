@@ -21,7 +21,8 @@ def send_notif(sender,instance,raw,created, **kwargs):
             data = {
                     "from":instance.from_user.username,
                     "notif_id":instance.id,
-                    "notif":instance.content
+                    "notif":instance.content,
+                    "picture":instance.from_user.picture.url
                     }
 
             group_name="notification_%s" % current_user.username

@@ -60,6 +60,8 @@ class PictureSerializer(serializers.Serializer):
 class UserFollowerSerializer(serializers.ModelSerializer):
     picture=serializers.SerializerMethodField('picture_func')
     username=serializers.SerializerMethodField('username_func')
+    name=serializers.SerializerMethodField('name_func')
+    bio=serializers.SerializerMethodField('bio_func')
     def picture_func(self,instance):
         img={}
         img['picture']=instance.user_id.picture
@@ -67,13 +69,19 @@ class UserFollowerSerializer(serializers.ModelSerializer):
         return serializer.data['picture']
     def username_func(self,instance):
         return instance.user_id.username
+    def name_func(self,instance):
+        return instance.user_id.name
+    def bio_func(self,instance):
+        return instance.user_id.bio
     class Meta:
          model=UserFollowing
-         fields=('username','picture')
+         fields=('username','picture','name','bio')
 
 class UserFollowingSerializer(serializers.ModelSerializer):
     picture=serializers.SerializerMethodField('picture_func')
     username=serializers.SerializerMethodField('username_func')
+    name=serializers.SerializerMethodField('name_func')
+    bio=serializers.SerializerMethodField('bio_func')
     def picture_func(self,instance):
         img={}
         img['picture']=instance.following_user_id.picture
@@ -81,9 +89,13 @@ class UserFollowingSerializer(serializers.ModelSerializer):
         return serializer.data['picture']
     def username_func(self,instance):
         return instance.following_user_id.username
+    def name_func(self,instance):
+        return instance.following_user_id.name
+    def bio_func(self,instance):
+        return instance.following_user_id.bio
     class Meta:
          model=UserFollowing
-         fields=('username','picture')
+         fields=('username','picture','name','bio')
 
 
 class PublicProfileSerializer(serializers.ModelSerializer):
