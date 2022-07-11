@@ -18,7 +18,7 @@ from random import randint
 from rest_framework.generics import GenericAPIView
 from rest_framework import permissions
 from rest_framework.parsers import MultiPartParser, FormParser
-from notification.views import notif        
+from notification.views import notif, get_notif    
 
 def randomNumber():
     value = randint(1000, 9999)
@@ -163,6 +163,8 @@ class send_follow_request(APIView):
             if F_requests:
                 if F_requests.is_active:
                     F_requests.delete()
+                    user_notif=get_notif(T_user,user)
+                    user_notif.delete()
                     return Response({"message": "friend request canceled"}, status=status.HTTP_200_OK)
                 else:
                     return Response({"message": "friend request is declined"}, status=status.HTTP_200_OK)

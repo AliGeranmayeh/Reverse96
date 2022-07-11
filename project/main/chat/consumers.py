@@ -1,8 +1,11 @@
 from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from django.shortcuts import get_object_or_404
 import json
+from .serializer import MessageModelSerializer
 from .models import Message, Chat
+from user.models import CustomUser
 from .views import get_last_10_messages, get_reply_message, get_user_contact, get_current_chat,get_unseen_messages
 
 User = get_user_model()
@@ -16,7 +19,7 @@ class ChatConsumer(WebsocketConsumer):
             'command': 'messages',
             'messages': self.messages_to_json(messages)
         }
-        print(content)
+        #print(content)
         return self.send_message(content)
 
     def fetch_unseen_messages(self,data):
@@ -42,6 +45,7 @@ class ChatConsumer(WebsocketConsumer):
             content=data['message'])
         current_chat = get_current_chat(data['chatId'])
         current_chat.messages.add(message)
+        print('New Message (.__dict__):',message.__dict__)
         current_chat.save()
         content = {
             'command': 'new_message',
@@ -81,9 +85,36 @@ class ChatConsumer(WebsocketConsumer):
 
     
     def delete_message(self, data):
-        message=get_reply_message(data['chatId'],data['id'])
-        message.delete()
-        self.send_command_to_front()
+        #global ms
+        if not data['undo']:
+            #ms={}
+            message=get_reply_message(data['chatId'],data['id'])
+            self.ms = MessageModelSerializer(message).data
+            message.delete()
+            self.send_command_to_front()
+            
+        if data['undo']:
+            #message=Message(**ms)
+            if ('ms' in self.__dict__ and self.ms != 'empty'):
+                print('UNDO- ms: ',self.ms['id'])
+                self.ms['contact'] = get_object_or_404(CustomUser, id=self.ms['contact'])
+                message = Message(**self.ms)
+                print('UNDO- message: ',message.id)
+                message.save()
+                message = Message.objects.get(id = self.ms['id'])
+                message.timestamp = self.ms['timestamp']
+                message.save()
+                self.ms = 'empty';
+            else:
+                #Fail & stuff...
+                print("Can't undo!")
+            
+            current_chat = get_current_chat(data['chatId'])
+            current_chat.messages.add(message)
+            current_chat.save()
+            self.send_command_to_front()
+
+
 
 
 

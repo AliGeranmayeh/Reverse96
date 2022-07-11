@@ -22,6 +22,25 @@ class review_serializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by','is_public',
         'location_picture','location_name']
 
+class user_review_serializer(serializers.ModelSerializer):
+    location_name=serializers.SerializerMethodField('get_name')
+    location_picture=serializers.SerializerMethodField('get_picture')
+    comment_no=serializers.SerializerMethodField('get_comment_no')
+    def get_name(self,instance):
+        return instance.location.name
+    def get_picture(self,instance):
+        img={}
+        img['picture']=instance.location.picture
+        serializer=PictureSerializer(img)
+        return serializer.data['picture']
+    def get_comment_no(self,instance):
+        return len(instance.comment_set.all())
+
+    class Meta:
+        model = review
+        fields = ['id', 'title', 'user', 'text', 'picture', 'date_created','location','liked_by','is_public',
+        'location_picture','location_name','comment_no']
+
 class review_serializer_username_inlcluded(serializers.ModelSerializer):
     username=serializers.SerializerMethodField('username_function')
     def username_function(self,reviews):
@@ -59,9 +78,15 @@ class location_review_serializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    picture=serializers.SerializerMethodField('func_pic')
+    def func_pic(self,instance):
+        img={}
+        img['picture']=instance.author.picture
+        serializer=PictureSerializer(img)
+        return serializer.data['picture']
     class Meta:
         model = Comment
-        fields = ['author', 'place', 'comment_text']
+        fields = ['author', 'place', 'comment_text','picture']
 
 
 

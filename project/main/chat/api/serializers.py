@@ -37,6 +37,19 @@ class ChatSerializer(serializers.ModelSerializer):
             chat.picture=validated_data['picture']        
         chat.save()
         return chat
+    def update(self, instance, validated_data):
+        participants = validated_data.pop('participants')
+        for username in participants:
+            contact = get_user_contact(username)
+            instance.participants.add(contact)
+        instance.name=validated_data['name']
+        if 'description' in validated_data:
+            instance.description=validated_data['description']
+        if 'picture' in validated_data:
+            instance.picture=validated_data['picture']        
+        instance.save()
+        return instance
+        
 
 
 # do in python shell to see how to serialize data
