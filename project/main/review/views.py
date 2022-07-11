@@ -159,14 +159,14 @@ class CommentViewAPI(APIView):
 
     def post(self, request, pk=None):
         placees_info = review.objects.filter(id=pk)
-        CommentSerializer(placees_info, many=False)
 
         if not placees_info:
             return Response({'message': "place does not exist"}, status=status.HTTP_404_NOT_FOUND)
         else:
+            comments=CommentSerializer(Comment.objects.filter(place=pk), many=True)
             comlist = [{'auth': com.author.username, 'text': com.comment_text} for com in
                        Comment.objects.filter(place=pk)]
-            return Response({'message': comlist}, status=status.HTTP_201_CREATED)
+            return Response({'message': comments.data}, status=status.HTTP_201_CREATED)
 
 class SubmitCommentAPI(APIView):
     serializer_class = CommentCreationSerializer
