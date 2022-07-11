@@ -79,6 +79,9 @@ class location_review_serializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     picture=serializers.SerializerMethodField('func_pic')
+    auth=serializers.SerializerMethodField('func_auth')
+    def func_auth(self,instance):
+        return instance.author.username
     def func_pic(self,instance):
         img={}
         img['picture']=instance.author.picture
@@ -86,7 +89,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return serializer.data['picture']
     class Meta:
         model = Comment
-        fields = ['author', 'place', 'comment_text','picture']
+        fields = ['auth', 'place', 'comment_text','picture']
 
 
 
