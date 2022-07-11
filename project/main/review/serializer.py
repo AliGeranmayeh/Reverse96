@@ -78,9 +78,15 @@ class location_review_serializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    picture=serializers.SerializerMethodField('func_pic')
+    def func_pic(self,instance):
+        img={}
+        img['picture']=instance.author.picture
+        serializer=PictureSerializer(img)
+        return serializer.data['picture']
     class Meta:
         model = Comment
-        fields = ['author', 'place', 'comment_text']
+        fields = ['author', 'place', 'comment_text','picture']
 
 
 
