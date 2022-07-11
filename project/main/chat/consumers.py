@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
+from .serializer import MessageModelSerializer
 from .models import Message, Chat
 from .views import get_last_10_messages, get_reply_message, get_user_contact, get_current_chat,get_unseen_messages
 
@@ -81,9 +82,21 @@ class ChatConsumer(WebsocketConsumer):
 
     
     def delete_message(self, data):
-        message=get_reply_message(data['chatId'],data['id'])
-        message.delete()
-        self.send_command_to_front()
+        global ms
+        if not data['undo']:
+            ms={}
+            message=get_reply_message(data['chatId'],data['id'])
+            ms=MessageModelSerializer(message).data
+            message.delete()
+            self.send_command_to_front()
+        if data['undo']:
+            message=Message(**ms)
+            message.save()
+            current_chat = get_current_chat(data['chatId'])
+            current_chat.messages.add(message)
+            current_chat.save()
+
+
 
 
 
